@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/login_background"
     android:padding="16dp"
-    tools:context=".LoginActivity">
+    tools:context=".RegisterActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -31,9 +31,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/sfpro_bold"
                 android:text="@string/username_phone_email"
                 android:textColor="@color/black"
-                android:fontFamily="@font/sfpro_bold"
                 android:textSize="14sp" />
 
             <EditText
@@ -67,14 +67,61 @@
                 android:padding="16dp"
                 android:textSize="16sp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/repeat_password"
+                android:textColor="@color/black"
+                android:fontFamily="@font/sfpro_bold"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/editTextRepeatPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/edit_text_background"
+                android:inputType="textPassword"
+                android:padding="16dp"
+                android:textSize="16sp" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupUserType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioButtonCareseeker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:buttonTint="@color/radio_button_tint"
+                    android:checked="true"
+                    android:fontFamily="@font/sfpro_med"
+                    android:text="@string/i_am_a_careseeker"
+                    android:textColor="@color/black" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonCalingaPro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/radio_button_tint"
+                    android:fontFamily="@font/sfpro_med"
+                    android:text="@string/i_am_a_calingapro"
+                    android:textColor="@color/black" />
+            </RadioGroup>
+
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/buttonLogin"
+                android:id="@+id/buttonCreateAccount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:background="@drawable/button_background"
                 android:padding="14dp"
-                android:text="@string/login"
+                android:text="@string/create_account"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
@@ -89,17 +136,17 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/dont_have_account"
+                    android:text="@string/already_have_account"
                     android:fontFamily="@font/sfpro_med"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/textViewRegister"
+                    android:id="@+id/textViewLogIn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="@string/register_instead"
+                    android:text="@string/log_in_instead"
                     android:fontFamily="@font/sfpro_med"
                     android:textColor="@color/black"
                     android:textSize="14sp" />

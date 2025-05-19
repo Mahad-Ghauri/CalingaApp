@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -27,11 +28,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17 // Update to Java 17
+        targetCompatibility = JavaVersion.VERSION_17 // Update to Java 17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17" // Update to match Java version
     }
 }
 
@@ -43,6 +44,17 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation("de.hdodenhof:circleimageview:3.1.0") // Add CircleImageView dependency
+    
+    // Firebase dependencies with fixed BOM version
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0")) // Downgrade to a more stable version
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-storage-ktx") // Add Firebase Storage dependency
+    
+    // Add Glide for image loading
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -13,6 +13,9 @@
         android:theme="@style/Theme.CalingaApp"
         tools:targetApi="31">
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".CaregiverHomeActivity"
             android:exported="false" />
         <activity
@@ -35,6 +38,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DocumentsSubmissionActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

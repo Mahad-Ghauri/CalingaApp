@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1027576711601",
+    "project_id": "calingaapp",
+    "storage_bucket": "calingaapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027576711601:android:eee92eac73d7dd5da19590",
+        "android_client_info": {
+          "package_name": "com.myapp.calingaapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5XvbHXJ3XOd-VCiicLABANs9mzxrHsH0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

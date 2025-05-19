@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Calinga App</string>
     <string name="app_logo">App Logo</string>
-    <string name="username_phone_email">username | phone | email</string>
+    <string name="username_phone_email">phone | email</string>
     <string name="email_hint">user@careapp.com</string>
     <string name="password">Password</string>
     <string name="repeat_password">Repeat Password</string>
@@ -11,4 +11,22 @@
     <string name="already_have_account">Already have an account?</string>
     <string name="log_in_instead"><b>Log in</b> Instead</string>
     <string name="profile_photo">Profile Photo</string>
+    
+    <!-- New strings for login page -->
+    <string name="login">Log In</string>
+    <string name="dont_have_account">Don\'t have an account yet?</string>
+    <string name="register_instead"><b>Register</b> Instead</string>
+    
+    <!-- Strings for navigation drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    
+    <!-- Strings for document submission -->
+    <string name="document_submission_title">CALiNGApro Compliance Documents</string>
+    <string name="document_submission_description">Please select your role and upload the required documents to get qualified as a CALiNGApro.</string>
+    <string name="select_role">Select Your Role:</string>
+    <string name="required_documents">Required Documents:</string>
+    <string name="submit_documents">Submit Documents for Review</string>
+    <string name="upload_document">Upload Document</string>
+    <string name="view_document">View Document</string>
 </resources>
