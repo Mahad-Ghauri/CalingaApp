@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA"
+    tools:context=".CareseekerHomeActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/toolbar_background"
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent">
+                
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/logo_calinga"
+                    android:contentDescription="Calinga Logo"
+                    android:background="@drawable/logo_circle_background" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/sfpro_bold"
+                android:text="CALiNGApro"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+
+            <ImageView
+                android:id="@+id/imageViewMenu"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_menu"
+                app:tint="@color/white" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Patient Info Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewPatient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/patient_card_background"
+            android:padding="12dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imageViewPatient"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/careseeker"
+                app:civ_border_color="@color/bright_orange"
+                app:civ_border_width="2dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textViewPatientName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sfpro_bold"
+                    android:text="Maria Santos"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/textViewPatientAge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sfpro_med"
+                    android:text="67 years old"
+                    android:textColor="@color/white"
+                    android:alpha="0.9"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/textViewPatientAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_location"
+                    android:drawablePadding="4dp"
+                    android:drawableTint="@color/bright_orange"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/sfpro_med"
+                    android:maxLines="1"
+                    android:text="123 Oak Street, Los Angeles, CA 90001"
+                    android:textColor="@color/white"
+                    android:alpha="0.8"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Search Bar with Orange Accent -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardViewPatient">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_search"
+                app:tint="@color/bright_orange" />
+
+            <EditText
+                android:id="@+id/editTextSearch"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:fontFamily="@font/sfpro_med"
+                android:hint="Search for a professional..."
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textSize="16sp"
+                android:textColorHint="@color/text_gray"
+                android:textColor="@color/dark_blue" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/textViewCaregivers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/sfpro_bold"
+        android:text="Available Professionals"
+        android:textColor="@color/dark_blue"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardViewSearch" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCaregivers"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewCaregivers"
+        tools:listitem="@layout/item_calingapro" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="Filter professionals"
+        android:src="@drawable/ic_filter"
+        app:backgroundTint="@color/button_orange"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@color/white" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

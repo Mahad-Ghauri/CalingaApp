@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="text_gray">#757575</color>
+    <color name="input_border">#E0E0E0</color>
+    <color name="button_orange">#F5A623</color>
+    <color name="bright_orange">#FF7A00</color>
+    <color name="link_blue">#2196F3</color>
+    <color name="radio_button_tint">#2196F3</color>
+    <color name="profile_header_blue">#3B82F6</color>
+    <color name="light_blue">#60A5FA</color>
+    <color name="dark_blue">#1E3A8A</color>
+</resources>

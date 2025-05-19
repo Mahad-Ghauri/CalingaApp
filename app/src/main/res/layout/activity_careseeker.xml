@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F2"
+    tools:context=".CaresekerActivity">
+
+
+    <ImageView
+        android:id="@+id/imageViewLogo"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/logo_calinga"
+        android:contentDescription="Calinga Logo"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageViewLogo">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/profile_header_blue"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/imageViewPhoto"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="#FFA500"
+                    android:padding="8dp"
+                    android:src="@drawable/careseeker"
+                    android:contentDescription="@string/profile_photo" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textViewName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Maria Santos"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textViewTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Careseeker, Calinga"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/textViewEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="maria@gmail.com"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/textViewPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+1 456 789 0123"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+                    <RatingBar
+                        android:id="@+id/ratingBar"
+                        style="?android:attr/ratingBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:isIndicator="true"
+                        android:numStars="5"
+                        android:progressTint="#FFD700"
+                        android:rating="4.5" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="2"
+                android:padding="12dp"
+                android:alignmentMode="alignMargins">
+
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/sfpro_med"
+                            android:text="Age"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/textViewAge"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:text="67yrs"
+                            android:textColor="@color/black"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Specialization/Needs -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Needs"
+                            android:fontFamily="@font/sfpro_med"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/textViewSpecialization"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:gravity="center"
+                            android:text="Geriatric"
+                            android:textColor="@color/black"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Weight -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Weight"
+                            android:fontFamily="@font/sfpro_med"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/textViewWeight"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:text="68kg"
+                            android:textColor="@color/black"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Height -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Height"
+                            android:textColor="@color/text_gray"
+                            android:fontFamily="@font/sfpro_med"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/textViewHeight"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:text="160cm"
+                            android:textColor="@color/black"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </GridLayout>
+
+            <!-- Accept Button -->
+            <Button
+                android:id="@+id/buttonAcceptCare"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:backgroundTint="@color/button_orange"
+                android:padding="12dp"
+                android:fontFamily="@font/sfpro_bold"
+                android:text="Accept Care"
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
+
+            <!-- About Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="About Maria"
+                    android:fontFamily="@font/sfpro_bold"
+                    android:textColor="@color/link_blue"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textViewAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sfpro_med"
+                    android:layout_marginTop="8dp"
+                    android:text="Maria Santos is a 68-year-old retired teacher living in Los Angeles. After dedicating over four decades to educating young minds, she now focuses on maintaining her health and enjoying her time with her grandchildren. Maria is a warm, respectful, and independent individual who occasionally seeks professional assistance for daily tasks and regular medical check-ups. As a careseeker, she values trust, patience, and compassion in the people she works with. Maria is looking for a reliable and kind-hearted caregiver who can help her stay active, healthy, and comfortable in her daily routine."
+                    android:textColor="@color/text_gray" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

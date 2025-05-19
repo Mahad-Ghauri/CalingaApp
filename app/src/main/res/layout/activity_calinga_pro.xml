@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F2"
+    tools:context=".CalingaProActivity">
+
+    <ImageView
+        android:id="@+id/imageViewLogo"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/logo_calinga"
+        android:contentDescription="Calinga Logo"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageViewLogo">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/profile_header_blue"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/imageViewPhoto"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="#FFA500"
+                    android:padding="8dp"
+                    android:src="@drawable/caregiver"
+                    android:contentDescription="@string/profile_photo" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textViewName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CALINGApro Antiba Manalo"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textViewTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sfpro_med"
+                        android:text="CALINGApro"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/textViewEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sfpro_med"
+                        android:text="antiba@gmail.com"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/textViewPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+1 561 236 2033"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="2"
+                android:padding="12dp"
+                android:alignmentMode="alignMargins">
+
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Experience"
+                            android:fontFamily="@font/sfpro_med"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/textViewExperience"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="2yrs"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:textColor="@color/black"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/sfpro_med"
+                            android:text="Patients"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/textViewPatients"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="923"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:textColor="@color/black"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Blood Type"
+                            android:fontFamily="@font/sfpro_med"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/textViewBloodType"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="O+"
+                            android:textColor="@color/black"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Height"
+                            android:fontFamily="@font/sfpro_med"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/textViewHeight"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="185cm"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </GridLayout>
+
+
+            <Button
+                android:id="@+id/buttonAcceptCare"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:backgroundTint="@color/button_orange"
+                android:padding="12dp"
+                android:fontFamily="@font/sfpro_bold"
+                android:text="Accept Patient"
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="About Antiba"
+                    android:fontFamily="@font/sfpro_bold"
+                    android:textColor="@color/link_blue"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textViewAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/sfpro_med"
+                    android:text="Antiba Manalo is a compassionate and experienced family medicine practitioner based in Los Angeles. With over 12 years of experience in the healthcare field, she has dedicated her career to providing holistic and patient-centered care to individuals and families. Antiba is known for her warm approach, clear communication, and commitment to promoting preventive health. She currently runs the Manalo Family Health Clinic, where she attends to patients from Monday to Friday, 9:00 AM to 5:00 PM. Fluent in both English and Filipino, Antiba ensures that her patients feel heard and understood at every step of their wellness journey."
+                    android:textColor="@color/text_gray" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
