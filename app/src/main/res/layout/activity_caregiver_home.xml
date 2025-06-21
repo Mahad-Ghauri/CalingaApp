@@ -96,7 +96,7 @@
             android:layout_margin="16dp"
             android:contentDescription="Search careseekers"
             android:src="@drawable/ic_search"
-            app:backgroundTint="@color/button_orange"
+            app:backgroundTint="?attr/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:tint="@color/white" />

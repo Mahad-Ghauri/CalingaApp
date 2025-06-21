@@ -12,4 +12,5 @@
     <color name="light_blue">#60A5FA</color>
     <color name="dark_blue">#1E3A8A</color>
     <color name="bright_green">#4CAF50</color>
+    <color name="light_blue_button">#4A90E2</color>
 </resources>

@@ -58,7 +58,7 @@
                 android:id="@+id/buttonUpload"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:background="@drawable/button_secondary"
+                android:backgroundTint="?attr/colorPrimary"
                 android:fontFamily="@font/sfpro_bold"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"

@@ -54,7 +54,8 @@ dependencies {
     
     // Add Glide for image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
-    
+
+    implementation ("org.osmdroid:osmdroid-android:6.1.20")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
