@@ -293,12 +293,17 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
             )
         )
     }
-    
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+      override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_home -> {
                 // We're already in the home screen, just close drawer
                 drawerLayout.closeDrawer(GravityCompat.START)
+            }
+            R.id.nav_map -> {
+                // Launch map activity for careseeker
+                val intent = Intent(this, MapActivity::class.java)
+                intent.putExtra("USER_ROLE", "careseeker")
+                startActivity(intent)
             }
             R.id.nav_profile -> {
                 // Launch profile activity

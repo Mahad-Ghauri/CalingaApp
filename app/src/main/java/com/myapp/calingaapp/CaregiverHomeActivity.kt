@@ -77,12 +77,17 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         careseekerList.add(Careseeker("Dorothy Taylor", 69, "606 Willow Way, Bakersfield, CA 93301"))
         careseekerList.add(Careseeker("William Davis", 73, "707 Aspen Circle, Anaheim, CA 92805"))
     }
-    
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+      override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_home -> {
                 // We're already in the home screen, just close drawer
                 drawerLayout.closeDrawer(GravityCompat.START)
+            }
+            R.id.nav_map -> {
+                // Launch map activity for caregiver
+                val intent = Intent(this, MapActivity::class.java)
+                intent.putExtra("USER_ROLE", "caregiver")
+                startActivity(intent)
             }
             R.id.nav_profile -> {
                 // Launch profile activity
