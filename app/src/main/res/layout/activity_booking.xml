@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".BookingActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="32dp">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_back"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Book Appointment"
+                android:textSize="24sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/sfpro_bold"
+                android:gravity="center"
+                android:layout_marginEnd="24dp" />
+
+        </LinearLayout>
+
+        <!-- Preferred Date -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preferred Date"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/sfpro_med"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/edit_text_background"
+            android:padding="16dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:id="@+id/layout_date">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"                android:src="@drawable/ic_calendar"
+                android:layout_marginEnd="12dp"
+                app:tint="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tv_selected_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select Date"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="@font/sfpro_med" />
+
+        </LinearLayout>
+
+        <!-- Preferred Time -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preferred Time"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/sfpro_med"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/edit_text_background"
+            android:padding="16dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:id="@+id/layout_time">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"                android:src="@drawable/ic_time"
+                android:layout_marginEnd="12dp"
+                app:tint="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tv_selected_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select Time"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="@font/sfpro_med" />
+
+        </LinearLayout>
+
+        <!-- Address of Service -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Address of Service"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/sfpro_med"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"            app:boxStrokeColor="@color/light_blue_button"
+            app:hintTextColor="@color/text_secondary"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter service address"
+                android:fontFamily="@font/sfpro_med"
+                android:textSize="16sp"
+                android:maxLines="3"
+                android:inputType="textPostalAddress|textMultiLine" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Notes for CALiNGApro -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notes for CALiNGApro (Optional)"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/sfpro_med"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"            app:boxStrokeColor="@color/light_blue_button"
+            app:hintTextColor="@color/text_secondary"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Any special instructions or requirements..."
+                android:fontFamily="@font/sfpro_med"
+                android:textSize="16sp"
+                android:minLines="3"
+                android:maxLines="5"
+                android:gravity="top"
+                android:inputType="textMultiLine|textCapSentences" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Payment Method -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Payment Method"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/sfpro_med"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/edit_text_background"
+            android:padding="16dp"
+            android:layout_marginBottom="32dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:id="@+id/layout_payment">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"                android:src="@drawable/ic_payment"
+                android:layout_marginEnd="12dp"
+                app:tint="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tv_selected_payment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select Payment Method"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="@font/sfpro_med" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_arrow_down"
+                app:tint="@color/text_secondary" />
+
+        </LinearLayout>
+
+        <!-- Confirm Booking Button -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:id="@+id/btn_confirm_booking"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/light_blue_button"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm Booking"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/sfpro_bold" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>

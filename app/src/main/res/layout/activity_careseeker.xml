@@ -283,7 +283,7 @@
                 android:backgroundTint="@color/button_orange"
                 android:padding="12dp"
                 android:fontFamily="@font/sfpro_bold"
-                android:text="Accept Care"
+                android:text="Accept Patient"
                 android:textAllCaps="false"
                 android:textColor="@color/white" />
 

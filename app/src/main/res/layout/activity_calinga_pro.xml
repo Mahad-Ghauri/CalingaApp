@@ -266,7 +266,7 @@
 
 
             <Button
-                android:id="@+id/buttonAcceptCare"
+                android:id="@+id/buttonBookAppointment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -274,7 +274,7 @@
                 android:backgroundTint="@color/light_blue_button"
                 android:padding="12dp"
                 android:fontFamily="@font/sfpro_bold"
-                android:text="Accept Patient"
+                android:text="Book Appointment"
                 android:textAllCaps="false"
                 android:textColor="@color/white" />
 

@@ -45,9 +45,11 @@
             android:name=".ProfileActivity"
             android:exported="false" />        <activity
             android:name=".DocumentsSubmissionActivity"
+            android:exported="false" />        <activity
+            android:name=".MapActivity"
             android:exported="false" />
         <activity
-            android:name=".MapActivity"
+            android:name=".BookingActivity"
             android:exported="false" />
     </application>
 
