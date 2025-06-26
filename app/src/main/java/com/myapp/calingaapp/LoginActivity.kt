@@ -109,7 +109,7 @@ class LoginActivity : AppCompatActivity() {
                 // loadingIndicator.visibility = View.GONE
                 
                 if (document != null && document.exists()) {
-                    val userType = document.getString("userType")?.lowercase() ?: ""
+                    val userType = document.getString("role")?.lowercase() ?: ""
                     
                     when (userType) {
                         "careseeker" -> {

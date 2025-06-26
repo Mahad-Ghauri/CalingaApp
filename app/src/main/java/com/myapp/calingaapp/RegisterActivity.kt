@@ -2,6 +2,8 @@ package com.myapp.calingaapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
@@ -18,7 +20,9 @@ class RegisterActivity : AppCompatActivity() {
     
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
-    private lateinit var editTextUsername: EditText
+    private lateinit var editTextFullName: EditText
+    private lateinit var editTextEmail: EditText
+    private lateinit var editTextPhone: EditText
     private lateinit var editTextPassword: EditText
     private lateinit var editTextRepeatPassword: EditText
     
@@ -37,7 +41,9 @@ class RegisterActivity : AppCompatActivity() {
         }
         
         // Get references to UI components
-        editTextUsername = findViewById(R.id.editTextUsername)
+        editTextFullName = findViewById(R.id.editTextFullName)
+        editTextEmail = findViewById(R.id.editTextEmail)
+        editTextPhone = findViewById(R.id.editTextPhone)
         editTextPassword = findViewById(R.id.editTextPassword)
         editTextRepeatPassword = findViewById(R.id.editTextRepeatPassword)
         val radioGroupUserType = findViewById<RadioGroup>(R.id.radioGroupUserType)
@@ -45,15 +51,30 @@ class RegisterActivity : AppCompatActivity() {
         val buttonCreateAccount = findViewById<Button>(R.id.buttonCreateAccount)
         val textViewLogIn = findViewById<TextView>(R.id.textViewLogIn)
         
+        // Auto-format phone number with +63 prefix
+        editTextPhone.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val text = s.toString()
+                if (!text.startsWith("+63") && text.isNotEmpty()) {
+                    editTextPhone.setText("+63$text")
+                    editTextPhone.setSelection(editTextPhone.text.length)
+                }
+            }
+        })
+        
         // Set click listener for create account button
         buttonCreateAccount.setOnClickListener {
-            val email = editTextUsername.text.toString().trim()
+            val fullName = editTextFullName.text.toString().trim()
+            val email = editTextEmail.text.toString().trim()
+            val phone = editTextPhone.text.toString().trim()
             val password = editTextPassword.text.toString().trim()
             val confirmPassword = editTextRepeatPassword.text.toString().trim()
             val userType = if (radioButtonCareseeker.isChecked) "careseeker" else "calingapro"
             
-            if (validateInputs(email, password, confirmPassword)) {
-                registerUser(email, password, userType)
+            if (validateInputs(fullName, email, phone, password, confirmPassword)) {
+                navigateToPhoneAuth(fullName, email, phone, password, userType)
             }
         }
         
@@ -65,10 +86,40 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
     
-    private fun validateInputs(email: String, password: String, confirmPassword: String): Boolean {
+    private fun validateInputs(fullName: String, email: String, phone: String, password: String, confirmPassword: String): Boolean {
+        if (fullName.isEmpty()) {
+            editTextFullName.error = "Full name is required"
+            editTextFullName.requestFocus()
+            return false
+        }
+        
         if (email.isEmpty()) {
-            editTextUsername.error = "Email is required"
-            editTextUsername.requestFocus()
+            editTextEmail.error = "Email is required"
+            editTextEmail.requestFocus()
+            return false
+        }
+        
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            editTextEmail.error = "Please enter a valid email address"
+            editTextEmail.requestFocus()
+            return false
+        }
+        
+        if (phone.isEmpty()) {
+            editTextPhone.error = "Phone number is required"
+            editTextPhone.requestFocus()
+            return false
+        }
+        
+        if (!phone.startsWith("+63")) {
+            editTextPhone.error = "Please use Philippine format (+63)"
+            editTextPhone.requestFocus()
+            return false
+        }
+        
+        if (phone.length < 13) {
+            editTextPhone.error = "Please enter a valid Philippine phone number"
+            editTextPhone.requestFocus()
             return false
         }
         
@@ -99,42 +150,14 @@ class RegisterActivity : AppCompatActivity() {
         return true
     }
     
-    private fun registerUser(email: String, password: String, userType: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // User created successfully, now store additional info in Firestore
-                    val user = auth.currentUser
-                    if (user != null) {
-                        // Create user document in Firestore
-                        val userMap = hashMapOf(
-                            "email" to email,
-                            "userType" to userType,
-                            "createdAt" to System.currentTimeMillis()
-                        )
-                        
-                        db.collection("users").document(user.uid)
-                            .set(userMap)
-                            .addOnSuccessListener {
-                                Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show()
-                                
-                                // Navigate based on user type
-                                if (userType == "careseeker") {
-                                    startActivity(Intent(this, CareseekerHomeActivity::class.java))
-                                } else {
-                                    startActivity(Intent(this, CaregiverHomeActivity::class.java))
-                                }
-                                finish()
-                            }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, "Failed to save user data: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                    }
-                } else {
-                    // If registration fails, display error message
-                    Toast.makeText(baseContext, "Registration failed: ${task.exception?.message}",
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
+    private fun navigateToPhoneAuth(fullName: String, email: String, phone: String, password: String, userType: String) {
+        val intent = Intent(this, PhoneAuthActivity::class.java).apply {
+            putExtra("fullName", fullName)
+            putExtra("email", email)
+            putExtra("phone", phone)
+            putExtra("password", password)
+            putExtra("role", userType)
+        }
+        startActivity(intent)
     }
 }

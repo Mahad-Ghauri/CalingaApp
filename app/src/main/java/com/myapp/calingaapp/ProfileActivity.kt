@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.Switch
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var editMedicalConditions: TextInputEditText
     private lateinit var saveButton: Button
     private lateinit var progressBar: ProgressBar
+    private var activeStatusSwitch: Switch? = null // Optional switch for CalingaPro active status
     
     private var photoUri: Uri? = null
     private var profilePhotoUrl: String = ""
@@ -76,6 +78,10 @@ class ProfileActivity : AppCompatActivity() {
         saveButton = findViewById(R.id.btn_save_profile)
         progressBar = findViewById(R.id.progress_bar)
         
+        // Initialize active status switch for CalingaPros (will be shown/hidden based on user type)
+        activeStatusSwitch = findViewById(R.id.switch_active_status)
+        activeStatusSwitch?.visibility = View.GONE // Hidden by default
+        
         // Load user profile data
         loadUserProfile()
         
@@ -113,22 +119,24 @@ class ProfileActivity : AppCompatActivity() {
                                     // Create a basic profile from user data
                                     userProfile = UserProfile(
                                         userId = currentUser.uid,
-                                        name = userData?.get("displayName") as? String ?: "",
-                                        email = currentUser.email ?: "",
-                                        userType = userData?.get("userType") as? String ?: ""
+                                        name = userData?.get("displayName") as? String ?: ""
                                     )
                                 }
                                 
                                 // Fill UI with profile data
                                 editName.setText(userProfile.name)
-                                editAge.setText(if (userProfile.age > 0) userProfile.age.toString() else "")
+                                editAge.setText(if (userProfile.age != null && userProfile.age!! > 0) userProfile.age.toString() else "")
                                 editAddress.setText(userProfile.address)
-                                editPhone.setText(userProfile.phoneNumber)
-                                editEmergencyContact.setText(userProfile.emergencyContact)
-                                editMedicalConditions.setText(userProfile.medicalConditions)
+                                // TODO: Phone, emergency contact, and medical conditions need to be added to new schema if needed
+                                // editPhone.setText("")
+                                // editEmergencyContact.setText("")
+                                // editMedicalConditions.setText("")
+                                
+                                // Show active status toggle for CalingaPros (need to check role from users collection)
+                                checkUserRoleAndShowToggle(currentUser.uid)
                                 
                                 // Load profile image if available
-                                profilePhotoUrl = userProfile.photoUrl
+                                profilePhotoUrl = userProfile.profilePhotoUrl
                                 if (profilePhotoUrl.isNotEmpty()) {
                                     // Load image using Glide or similar library
                                     // For simplicity, we're not implementing this here
@@ -203,27 +211,31 @@ class ProfileActivity : AppCompatActivity() {
         emergencyContact: String, 
         medicalConditions: String
     ) {
-        // Update the user profile object
-        userProfile = UserProfile(
-            userId = userId,
-            name = name,
-            age = age,
-            address = address,
-            email = auth.currentUser?.email ?: "",
-            photoUrl = profilePhotoUrl,
-            userType = userProfile.userType,
-            phoneNumber = phone,
-            medicalConditions = medicalConditions,
-            emergencyContact = emergencyContact
+        // Update the user profile object using the map approach since constructor parameters have changed
+        val updatedProfile = mapOf(
+            "userId" to userId,
+            "name" to name,
+            "age" to if (age > 0) age else null,
+            "address" to address,
+            "profilePhotoUrl" to profilePhotoUrl,
+            "isActive" to (activeStatusSwitch?.isChecked ?: userProfile.isActive),
+            "latitude" to userProfile.latitude,
+            "longitude" to userProfile.longitude,
+            "caregiverTier" to userProfile.caregiverTier,
+            "bio" to userProfile.bio,
+            "specialties" to userProfile.specialties,
+            "isApproved" to userProfile.isApproved,
+            "documents" to userProfile.documents,
+            "createdAt" to userProfile.createdAt
         )
         
         // Save to Firestore
         db.collection("userProfiles").document(userId)
-            .set(userProfile)
+            .set(updatedProfile)
             .addOnSuccessListener {
                 // Also update display name in main users collection
                 db.collection("users").document(userId)
-                    .update(mapOf("displayName" to name))
+                    .update(mapOf("fullName" to name))
                     .addOnSuccessListener {
                         Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
                         setResult(Activity.RESULT_OK)
@@ -243,6 +255,24 @@ class ProfileActivity : AppCompatActivity() {
     
     private fun showProgress(show: Boolean) {
         progressBar.visibility = if (show) View.VISIBLE else View.GONE
+    }
+    
+    private fun checkUserRoleAndShowToggle(userId: String) {
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { userDoc ->
+                if (userDoc != null && userDoc.exists()) {
+                    val userRole = userDoc.getString("role") ?: ""
+                    if (userRole == "calingapro") {
+                        activeStatusSwitch?.visibility = View.VISIBLE
+                        activeStatusSwitch?.isChecked = userProfile.isActive
+                        activeStatusSwitch?.text = "Available for work"
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error checking user role: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

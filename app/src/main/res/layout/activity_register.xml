@@ -32,19 +32,62 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/sfpro_bold"
-                android:text="@string/username_phone_email"
+                android:text="Full Name"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <EditText
-                android:id="@+id/editTextUsername"
+                android:id="@+id/editTextFullName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
                 android:background="@drawable/edit_text_background"
-                android:hint="@string/email_hint"
+                android:hint="Enter your full name"
+                android:fontFamily="@font/sfpro_med"
+                android:inputType="textPersonName"
+                android:padding="16dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sfpro_bold"
+                android:text="Email Address"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edit_text_background"
+                android:hint="Enter your email address"
                 android:fontFamily="@font/sfpro_med"
                 android:inputType="textEmailAddress"
+                android:padding="16dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sfpro_bold"
+                android:text="Phone Number"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/editTextPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edit_text_background"
+                android:hint="+63 9XX XXX XXXX"
+                android:fontFamily="@font/sfpro_med"
+                android:inputType="phone"
                 android:padding="16dp"
                 android:textSize="16sp" />
 

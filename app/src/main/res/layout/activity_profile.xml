@@ -138,6 +138,17 @@
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Active Status Switch for CalingaPros -->
+            <Switch
+                android:id="@+id/switch_active_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:text="Available for work"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
             <Button
                 android:id="@+id/btn_save_profile"
                 android:layout_width="match_parent"

@@ -1,6 +1,9 @@
 package com.myapp.calingaapp
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,15 +16,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlin.math.*
 
 class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -29,6 +36,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
     private lateinit var navigationView: NavigationView
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     
     private lateinit var recyclerView: RecyclerView
     private lateinit var calingaProAdapter: CalingaProAdapter
@@ -41,6 +49,8 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
     private lateinit var navHeaderImage: CircleImageView
     
     private var userProfile: UserProfile? = null
+    private var currentLatitude: Double = 0.0
+    private var currentLongitude: Double = 0.0
     
     private val profileActivityLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -58,6 +68,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         // Initialize Firebase components
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         
         // Initialize UI components
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -103,10 +114,6 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         recyclerView = findViewById(R.id.recyclerViewCaregivers)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Add sample data
-        populateCalingaProList()
-        filteredList.addAll(calingaProList)
-
         // Set up adapter
         calingaProAdapter = CalingaProAdapter(filteredList)
         recyclerView.adapter = calingaProAdapter
@@ -116,8 +123,9 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
             // Handle filter click
         }
         
-        // Load user profile data
+        // Load user profile data and get location
         loadUserProfile()
+        getCurrentLocationAndLoadCalingaPros()
     }
     
     private fun loadUserProfile() {
@@ -146,9 +154,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
                                     // Initialize empty profile
                                     userProfile = UserProfile(
                                         userId = currentUser.uid,
-                                        name = displayName,
-                                        email = currentUser.email ?: "",
-                                        userType = userDoc.getString("userType") ?: ""
+                                        name = displayName
                                     )
                                     
                                     // Show placeholder data in patient card
@@ -169,18 +175,18 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         userProfile?.let { profile ->
             // Update navigation drawer header
             navHeaderName.text = profile.name
-            navHeaderEmail.text = profile.email
+            // Email will need to be fetched from users collection since it's not in userProfiles
             
             // Update patient info card
             findViewById<TextView>(R.id.textViewPatientName).text = profile.name
-            findViewById<TextView>(R.id.textViewPatientAge).text = "${profile.age} years old"
+            findViewById<TextView>(R.id.textViewPatientAge).text = if (profile.age != null) "${profile.age} years old" else "Age not set"
             findViewById<TextView>(R.id.textViewPatientAddress).text = profile.address
             
             // Load profile image if available (you could use Glide or Picasso here)
-            if (profile.photoUrl.isNotEmpty()) {
+            if (profile.profilePhotoUrl.isNotEmpty()) {
                 // This would require a library like Glide or Picasso
-                // Glide.with(this).load(profile.photoUrl).into(navHeaderImage)
-                // Glide.with(this).load(profile.photoUrl).into(findViewById(R.id.imageViewPatient))
+                // Glide.with(this).load(profile.profilePhotoUrl).into(navHeaderImage)
+                // Glide.with(this).load(profile.profilePhotoUrl).into(findViewById(R.id.imageViewPatient))
             }
         }
     }
@@ -204,94 +210,111 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         calingaProAdapter.notifyDataSetChanged()
     }
 
-    private fun populateCalingaProList() {
-        // Add the sample data with photos and additional information
-        calingaProList.add(
-            CalingaPro(
-                name = "Emma Brown",
-                tier = "Basic",
-                address = "100 Market Street, San Francisco, CA 94103",
-                rate = 20,
-                photoResId = R.drawable.emma_brown,  // Use your actual drawable resource
-                experience = "3yrs",
-                patients = 125,
-                bloodType = "A+",
-                height = "165cm",
-                about = "Emma Brown is a dedicated caregiver with 3 years of experience caring for elderly patients. She specializes in companionship, medication management, and light housekeeping.",
-                email = "emma.brown@example.com",
-                phone = "+1 123-456-7890"
-            )
-        )
+    private fun getCurrentLocationAndLoadCalingaPros() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request location permissions
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
+            // Load CalingaPros without location sorting
+            loadActiveCalingaPros()
+            return
+        }
         
-        calingaProList.add(
-            CalingaPro(
-                name = "John Reyes",
-                tier = "CNA",
-                address = "456 Palm Street, San Diego, CA 92101",
-                rate = 22,
-                photoResId = R.drawable.doctor,  // Use your actual drawable resource
-                experience = "5yrs",
-                patients = 210,
-                bloodType = "B+",
-                height = "178cm",
-                about = "John Reyes is a Certified Nursing Assistant with extensive experience in post-operative care, mobility assistance, and vital sign monitoring.",
-                email = "john.reyes@example.com",
-                phone = "+1 234-567-8901"
-            )
-        )
-        
-        // Add remaining caregivers with similar detailed information
-        calingaProList.add(
-            CalingaPro(
-                name = "Angela Cruz",
-                tier = "LVN",
-                address = "789 Ocean Avenue, Long Beach, CA 90802",
-                rate = 28,
-                photoResId = R.drawable.angela_cruz,
-                experience = "7yrs",
-                patients = 350,
-                bloodType = "O-",
-                height = "162cm",
-                about = "Angela Cruz is a Licensed Vocational Nurse specializing in diabetes management, wound care, and patient education.",
-                email = "angela.cruz@example.com",
-                phone = "+1 345-678-9012"
-            )
-        )
-        
-        // Continue with remaining caregivers...
-        calingaProList.add(
-            CalingaPro(
-                name = "David Molina",
-                tier = "RN",
-                address = "321 Sunset Drive, Sacramento, CA 95814",
-                rate = 35,
-                photoResId = R.drawable.david_molina,
-                experience = "10yrs",
-                patients = 450,
-                bloodType = "AB+",
-                height = "180cm",
-                about = "David Molina is a Registered Nurse with a background in critical care and home health nursing. He excels in complex medical care management.",
-                email = "david.molina@example.com",
-                phone = "+1 456-789-0123"
-            )
-        )
-        
-        calingaProList.add(
-            CalingaPro(
-                name = "Kristine Gomez",
-                tier = "NP",
-                address = "654 Mission Street, San Francisco, CA 94105",
-                rate = 45,
-                photoResId = R.drawable.kistine_gomez,
-                experience = "12yrs",
-                patients = 520,
-                bloodType = "A-",
-                height = "168cm",
-                about = "Kristine Gomez is a Nurse Practitioner who provides comprehensive healthcare services including health assessments, medication management, and treatment plans.",
-                email = "kristine.gomez@example.com",
-                phone = "+1 567-890-1234"
-            )
-        )
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    currentLatitude = location.latitude
+                    currentLongitude = location.longitude
+                }
+                loadActiveCalingaPros()
+            }
+            .addOnFailureListener {
+                // If location fails, still load CalingaPros without sorting
+                loadActiveCalingaPros()
+            }
+    }
+    
+    private fun loadActiveCalingaPros() {
+        // First, get all users with role "calingapro"
+        db.collection("users")
+            .whereEqualTo("role", "calingapro")
+            .get()
+            .addOnSuccessListener { userDocs ->
+                val calingaproUserIds = userDocs.documents.map { it.id }
+                
+                if (calingaproUserIds.isEmpty()) {
+                    calingaProList.clear()
+                    filteredList.clear()
+                    calingaProAdapter.notifyDataSetChanged()
+                    return@addOnSuccessListener
+                }
+                
+                // Now get userProfiles for these users that are approved and active
+                db.collection("userProfiles")
+                    .whereIn("userId", calingaproUserIds)
+                    .whereEqualTo("isApproved", true)
+                    .whereEqualTo("isActive", true)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        calingaProList.clear()
+                        val tempList = ArrayList<CalingaPro>()
+                        
+                        for (document in documents) {
+                            val userProfile = document.toObject(UserProfile::class.java)
+                            
+                            val calingaPro = CalingaPro(
+                                name = userProfile.name,
+                                tier = userProfile.caregiverTier,
+                                address = userProfile.address,
+                                rate = 25, // Default rate, you can add this field to UserProfile later
+                                photoResId = R.drawable.ic_person_placeholder,
+                                experience = "1yr", // You can add this field to UserProfile later
+                                patients = 0, // You can add this field to UserProfile later
+                                bloodType = "O+", // You can add this field to UserProfile later
+                                height = "170cm", // You can add this field to UserProfile later
+                                about = userProfile.bio,
+                                email = "", // Will be fetched from users collection if needed
+                                phone = "", // Will be fetched from users collection if needed
+                                latitude = userProfile.latitude,
+                                longitude = userProfile.longitude
+                            )
+                            tempList.add(calingaPro)
+                        }
+                        
+                        // Sort by distance if location is available
+                        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+                            tempList.sortBy { calingaPro ->
+                                if (calingaPro.latitude != 0.0 && calingaPro.longitude != 0.0) {
+                                    calculateDistance(currentLatitude, currentLongitude, calingaPro.latitude, calingaPro.longitude)
+                                } else {
+                                    Double.MAX_VALUE // Put CalingaPros without location at the end
+                                }
+                            }
+                        }
+                        
+                        calingaProList.addAll(tempList)
+                        filteredList.clear()
+                        filteredList.addAll(calingaProList)
+                        calingaProAdapter.notifyDataSetChanged()
+                    }
+                    .addOnFailureListener { exception ->
+                        Toast.makeText(this, "Error loading CalingaPros: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error loading CalingaPros: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+    
+    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val r = 6371 // Radius of the Earth in kilometers
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = sin(dLat / 2) * sin(dLat / 2) +
+                cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+                sin(dLon / 2) * sin(dLon / 2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        return r * c
     }
       override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -349,5 +372,7 @@ data class CalingaPro(
     val height: String = "170cm",
     val about: String = "No information available.",
     val email: String = "",
-    val phone: String = ""
+    val phone: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
 )

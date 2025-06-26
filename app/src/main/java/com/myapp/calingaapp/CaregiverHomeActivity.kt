@@ -13,15 +13,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.*
 
 class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var recyclerView: RecyclerView
-    private lateinit var careseekerAdapter: CareseekerAdapter
-    private val careseekerList = ArrayList<Careseeker>()
+    private lateinit var bookingAdapter: BookingAdapter
+    private val bookingList = ArrayList<Booking>()
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +33,7 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
         
         // Initialize UI components
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -51,31 +56,72 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         recyclerView = findViewById(R.id.recyclerViewCareseekers)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Add sample data
-        populateCareseekerList()
+        // Set up adapter for bookings
+        bookingAdapter = BookingAdapter(bookingList)
+        recyclerView.adapter = bookingAdapter
 
-        // Set up adapter
-        careseekerAdapter = CareseekerAdapter(careseekerList)
-        recyclerView.adapter = careseekerAdapter
+        // Load today's bookings
+        loadTodaysBookings()
 
         // Set up click listeners
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            // Handle search click
+            // Handle refresh click
+            loadTodaysBookings()
         }
     }
 
-    private fun populateCareseekerList() {
-        // Add sample careseekers
-        careseekerList.add(Careseeker("Maria Santos", 67, "123 Oak Street, Los Angeles, CA 90001"))
-        careseekerList.add(Careseeker("Robert Garcia", 72, "456 Pine Avenue, San Diego, CA 92101"))
-        careseekerList.add(Careseeker("Elizabeth Chen", 65, "789 Maple Boulevard, San Francisco, CA 94103"))
-        careseekerList.add(Careseeker("James Wilson", 80, "101 Cedar Lane, Sacramento, CA 95814"))
-        careseekerList.add(Careseeker("Patricia Lopez", 70, "202 Birch Road, Fresno, CA 93721"))
-        careseekerList.add(Careseeker("Thomas Brown", 75, "303 Spruce Street, San Jose, CA 95113"))
-        careseekerList.add(Careseeker("Margaret Martinez", 68, "404 Redwood Drive, Oakland, CA 94607"))
-        careseekerList.add(Careseeker("Michael Johnson", 82, "505 Elm Court, Long Beach, CA 90802"))
-        careseekerList.add(Careseeker("Dorothy Taylor", 69, "606 Willow Way, Bakersfield, CA 93301"))
-        careseekerList.add(Careseeker("William Davis", 73, "707 Aspen Circle, Anaheim, CA 92805"))
+    private fun loadTodaysBookings() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Get current user's profile to get the caregiver name
+        db.collection("userProfiles").document(currentUser.uid)
+            .get()
+            .addOnSuccessListener { profileDoc ->
+                if (profileDoc.exists()) {
+                    val userProfile = profileDoc.toObject(UserProfile::class.java)
+                    val caregiverName = userProfile?.name ?: ""
+                    
+                    // Get today's date in the format used when booking
+                    val today = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(Date())
+                    
+                    // Query bookings for today for this caregiver
+                    db.collection("bookings")
+                        .whereEqualTo("calingaproId", currentUser.uid) // Updated to use calingaproId
+                        .whereEqualTo("date", today) // Updated to use date field
+                        .get()
+                        .addOnSuccessListener { documents ->
+                            bookingList.clear()
+                            
+                            for (document in documents) {
+                                // Use the document.toObject method with the new Booking schema
+                                val booking = document.toObject(Booking::class.java)
+                                if (booking != null) {
+                                    bookingList.add(booking)
+                                }
+                            }
+                            
+                            // Sort by time
+                            bookingList.sortBy { "${it.date} ${it.time}" } // Updated to use new fields
+                            bookingAdapter.notifyDataSetChanged()
+                            
+                            if (bookingList.isEmpty()) {
+                                Toast.makeText(this, "No bookings for today", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Toast.makeText(this, "Error loading bookings: ${exception.message}", Toast.LENGTH_SHORT).show()
+                        }
+                } else {
+                    Toast.makeText(this, "Profile not found", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error loading profile: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
     }
       override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -124,10 +170,3 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         }
     }
 }
-
-// Data class for Careseeker items
-data class Careseeker(
-    val name: String,
-    val age: Int,
-    val address: String
-)

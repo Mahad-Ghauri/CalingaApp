@@ -12,30 +12,31 @@ class CareseekerAdapter(private val careseekerList: List<Careseeker>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CareseekerViewHolder {
         val itemView = LayoutInflater
             .from(parent.context)
-            .inflate(R.layout.item_careseeker, parent, false)
+            .inflate(android.R.layout.simple_list_item_2, parent, false)
         return CareseekerViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: CareseekerViewHolder, position: Int) {
         val currentItem = careseekerList[position]
         holder.nameTextView.text = currentItem.name
-        holder.ageTextView.text = "${currentItem.age} years old"
+        holder.ageTextView.text = "${currentItem.age} years old - ${currentItem.address}"
         
-        // Extract city and state from address
-        val addressParts = currentItem.address.split(",")
-        if (addressParts.size >= 2) {
-            val cityState = "${addressParts[addressParts.size - 2].trim()}, ${addressParts[addressParts.size - 1].trim()}"
-            holder.locationTextView.text = cityState
-        } else {
-            holder.locationTextView.text = currentItem.address
+        holder.itemView.setOnClickListener {
+            // Handle item click if needed
         }
     }
 
     override fun getItemCount() = careseekerList.size
 
     class CareseekerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameTextView: TextView = itemView.findViewById(R.id.textViewName)
-        val ageTextView: TextView = itemView.findViewById(R.id.textViewAge)
-        val locationTextView: TextView = itemView.findViewById(R.id.textViewLocation)
+        val nameTextView: TextView = itemView.findViewById(android.R.id.text1)
+        val ageTextView: TextView = itemView.findViewById(android.R.id.text2)
     }
 }
+
+// Data class for Careseeker items (kept for compatibility)
+data class Careseeker(
+    val name: String,
+    val age: Int,
+    val address: String
+)
