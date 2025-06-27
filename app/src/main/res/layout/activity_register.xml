@@ -85,7 +85,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/edit_text_background"
-                android:hint="+63 9XX XXX XXXX"
+                android:hint="Enter your phone number"
                 android:fontFamily="@font/sfpro_med"
                 android:inputType="phone"
                 android:padding="16dp"
