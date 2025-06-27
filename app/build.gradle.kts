@@ -44,7 +44,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation("de.hdodenhof:circleimageview:3.1.0") // Add CircleImageView dependency
-    
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0") // Add SwipeRefreshLayout
     // Firebase dependencies with fixed BOM version
     implementation(platform("com.google.firebase:firebase-bom:32.7.0")) // Downgrade to a more stable version
     implementation("com.google.firebase:firebase-auth-ktx")

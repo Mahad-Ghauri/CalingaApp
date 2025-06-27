@@ -14,7 +14,7 @@ class CalingaProAdapter(private val calingaProList: List<CalingaPro>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalingaProViewHolder {
         val itemView = LayoutInflater
             .from(parent.context)
-            .inflate(R.layout.item_calingapro, parent, false)
+            .inflate(R.layout.item_calingapro_modern, parent, false)
         return CalingaProViewHolder(itemView)
     }
 
@@ -35,7 +35,16 @@ class CalingaProAdapter(private val calingaProList: List<CalingaPro>) :
             holder.locationTextView.text = currentItem.address
         }
         
-        holder.rateTextView.text = "$${currentItem.rate}/h"
+        // Format rate for modern display (just the number, since layout includes "/hour")
+        holder.rateTextView.text = "$${currentItem.rate}"
+        
+        // Show distance if available
+        if (currentItem.distanceInMiles > 0.0 && currentItem.distanceInMiles != Double.MAX_VALUE) {
+            holder.distanceTextView.visibility = android.view.View.VISIBLE
+            holder.distanceTextView.text = String.format("%.1f mi", currentItem.distanceInMiles)
+        } else {
+            holder.distanceTextView.visibility = android.view.View.GONE
+        }
         
         // Set click listener to open the caregiver profile
         holder.itemView.setOnClickListener {
@@ -66,6 +75,7 @@ class CalingaProAdapter(private val calingaProList: List<CalingaPro>) :
         val tierTextView: TextView = itemView.findViewById(R.id.textViewTier)
         val locationTextView: TextView = itemView.findViewById(R.id.textViewLocation)
         val rateTextView: TextView = itemView.findViewById(R.id.textViewRate)
+        val distanceTextView: TextView = itemView.findViewById(R.id.textViewDistance)
     }
     
     companion object {

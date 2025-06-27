@@ -21,6 +21,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -37,10 +38,12 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationManager: LocationManager
     
     private lateinit var recyclerView: RecyclerView
     private lateinit var calingaProAdapter: CalingaProAdapter
     private lateinit var editTextSearch: EditText
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val calingaProList = ArrayList<CalingaPro>()
     private val filteredList = ArrayList<CalingaPro>()
     
@@ -61,6 +64,11 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         }
     }
 
+    companion object {
+        private const val GEOFENCE_RADIUS_MILES = 10.0
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_careseeker_home)
@@ -69,6 +77,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationManager = LocationManager(this)
         
         // Initialize UI components
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -113,10 +122,23 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recyclerViewCaregivers)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
 
         // Set up adapter
         calingaProAdapter = CalingaProAdapter(filteredList)
         recyclerView.adapter = calingaProAdapter
+
+        // Set up swipe refresh
+        swipeRefreshLayout.setOnRefreshListener {
+            getCurrentLocationAndLoadCalingaPros()
+        }
+        
+        // Set up swipe refresh colors
+        swipeRefreshLayout.setColorSchemeResources(
+            R.color.primary_color,
+            R.color.secondary_color,
+            R.color.accent_color
+        )
 
         // Set up click listeners
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
@@ -214,8 +236,8 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Request location permissions
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
-            // Load CalingaPros without location sorting
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            // Load CalingaPros without location filtering
             loadActiveCalingaPros()
             return
         }
@@ -225,89 +247,170 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
                 if (location != null) {
                     currentLatitude = location.latitude
                     currentLongitude = location.longitude
+                    
+                    // Update user's location in the locations collection
+                    locationManager.updateUserLocation(currentLatitude, currentLongitude) { success, error ->
+                        if (!success && error != null) {
+                            // Log error but don't stop the flow
+                            android.util.Log.e("LocationUpdate", "Failed to update location: $error")
+                        }
+                    }
                 }
                 loadActiveCalingaPros()
             }
             .addOnFailureListener {
-                // If location fails, still load CalingaPros without sorting
+                // If location fails, still load CalingaPros without filtering
+                Toast.makeText(this, "Unable to get location. Showing all available CalingaPros.", Toast.LENGTH_LONG).show()
                 loadActiveCalingaPros()
             }
     }
     
-    private fun loadActiveCalingaPros() {
-        // First, get all users with role "calingapro"
-        db.collection("users")
-            .whereEqualTo("role", "calingapro")
-            .get()
-            .addOnSuccessListener { userDocs ->
-                val calingaproUserIds = userDocs.documents.map { it.id }
-                
-                if (calingaproUserIds.isEmpty()) {
-                    calingaProList.clear()
-                    filteredList.clear()
-                    calingaProAdapter.notifyDataSetChanged()
-                    return@addOnSuccessListener
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            LOCATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted, try to get location again
+                    getCurrentLocationAndLoadCalingaPros()
+                } else {
+                    // Permission denied, show message and load all CalingaPros
+                    Toast.makeText(this, "Location permission denied. Showing all available CalingaPros.", Toast.LENGTH_LONG).show()
+                    loadActiveCalingaPros()
                 }
+            }
+        }
+    }
+    
+    private fun loadActiveCalingaPros() {
+        swipeRefreshLayout.isRefreshing = true
+        // Use LocationManager to get nearby CalingaPros
+        locationManager.getNearbyCalingaPros(
+            currentLatitude, 
+            currentLongitude, 
+            GEOFENCE_RADIUS_MILES
+        ) { nearbyLocations, error ->
+            
+            swipeRefreshLayout.isRefreshing = false
+            
+            if (error != null) {
+                Toast.makeText(this, "Error loading nearby CalingaPros: $error", Toast.LENGTH_SHORT).show()
+                return@getNearbyCalingaPros
+            }
+            
+            if (nearbyLocations.isEmpty()) {
+                calingaProList.clear()
+                filteredList.clear()
+                calingaProAdapter.notifyDataSetChanged()
                 
-                // Now get userProfiles for these users that are approved and active
-                db.collection("userProfiles")
-                    .whereIn("userId", calingaproUserIds)
-                    .whereEqualTo("isApproved", true)
-                    .whereEqualTo("isActive", true)
-                    .get()
-                    .addOnSuccessListener { documents ->
-                        calingaProList.clear()
-                        val tempList = ArrayList<CalingaPro>()
+                val message = if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+                    "No CalingaPros found within 10 miles of your location"
+                } else {
+                    "No CalingaPros available. Please enable location services to find nearby professionals."
+                }
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                return@getNearbyCalingaPros
+            }
+            
+            // Get the user IDs from the location data
+            val calingaproUserIds = nearbyLocations.map { it.uid }
+            
+            // Now get userProfiles for these users that are approved and active
+            db.collection("userProfiles")
+                .whereIn("userId", calingaproUserIds)
+                .whereEqualTo("isApproved", true)
+                .whereEqualTo("isActive", true)
+                .get()
+                .addOnSuccessListener { documents ->
+                    calingaProList.clear()
+                    val tempList = ArrayList<CalingaPro>()
+                    
+                    for (document in documents) {
+                        val userProfile = document.toObject(UserProfile::class.java)
                         
-                        for (document in documents) {
-                            val userProfile = document.toObject(UserProfile::class.java)
-                            
-                            val calingaPro = CalingaPro(
-                                name = userProfile.name,
-                                tier = userProfile.caregiverTier,
-                                address = userProfile.address,
-                                rate = 25, // Default rate, you can add this field to UserProfile later
-                                photoResId = R.drawable.ic_person_placeholder,
-                                experience = "1yr", // You can add this field to UserProfile later
-                                patients = 0, // You can add this field to UserProfile later
-                                bloodType = "O+", // You can add this field to UserProfile later
-                                height = "170cm", // You can add this field to UserProfile later
-                                about = userProfile.bio,
-                                email = "", // Will be fetched from users collection if needed
-                                phone = "", // Will be fetched from users collection if needed
-                                latitude = userProfile.latitude,
-                                longitude = userProfile.longitude
+                        // Find the corresponding location data
+                        val locationData = nearbyLocations.find { it.uid == userProfile.userId }
+                        
+                        // Calculate distance
+                        var distanceInMiles = 0.0
+                        if (currentLatitude != 0.0 && currentLongitude != 0.0 && locationData != null &&
+                            locationData.location.latitude != 0.0 && locationData.location.longitude != 0.0) {
+                            distanceInMiles = calculateDistanceInMiles(
+                                currentLatitude, currentLongitude,
+                                locationData.location.latitude, locationData.location.longitude
                             )
-                            tempList.add(calingaPro)
                         }
                         
-                        // Sort by distance if location is available
-                        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
-                            tempList.sortBy { calingaPro ->
-                                if (calingaPro.latitude != 0.0 && calingaPro.longitude != 0.0) {
-                                    calculateDistance(currentLatitude, currentLongitude, calingaPro.latitude, calingaPro.longitude)
-                                } else {
-                                    Double.MAX_VALUE // Put CalingaPros without location at the end
-                                }
+                        val calingaPro = CalingaPro(
+                            name = userProfile.name,
+                            tier = userProfile.caregiverTier,
+                            address = userProfile.address,
+                            rate = 25, // Default rate, you can add this field to UserProfile later
+                            photoResId = R.drawable.ic_person_placeholder,
+                            experience = "1yr", // You can add this field to UserProfile later
+                            patients = 0, // You can add this field to UserProfile later
+                            bloodType = "O+", // You can add this field to UserProfile later
+                            height = "170cm", // You can add this field to UserProfile later
+                            about = userProfile.bio,
+                            email = "", // Will be fetched from users collection if needed
+                            phone = "", // Will be fetched from users collection if needed
+                            latitude = locationData?.location?.latitude ?: 0.0,
+                            longitude = locationData?.location?.longitude ?: 0.0,
+                            distanceInMiles = distanceInMiles
+                        )
+                        tempList.add(calingaPro)
+                    }
+                    
+                    // Sort by distance if location is available
+                    if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+                        tempList.sortBy { calingaPro ->
+                            if (calingaPro.latitude != 0.0 && calingaPro.longitude != 0.0) {
+                                calingaPro.distanceInMiles
+                            } else {
+                                Double.MAX_VALUE // Put CalingaPros without location at the end
                             }
                         }
-                        
-                        calingaProList.addAll(tempList)
-                        filteredList.clear()
-                        filteredList.addAll(calingaProList)
-                        calingaProAdapter.notifyDataSetChanged()
                     }
-                    .addOnFailureListener { exception ->
-                        Toast.makeText(this, "Error loading CalingaPros: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    
+                    calingaProList.addAll(tempList)
+                    filteredList.clear()
+                    filteredList.addAll(calingaProList)
+                    calingaProAdapter.notifyDataSetChanged()
+                    
+                    // Show message about number of CalingaPros found
+                    val message = if (tempList.isEmpty()) {
+                        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+                            "No approved CalingaPros found within 10 miles"
+                        } else {
+                            "No approved CalingaPros available"
+                        }
+                    } else {
+                        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+                            "Found ${tempList.size} CalingaPro(s) within 10 miles"
+                        } else {
+                            "Found ${tempList.size} CalingaPro(s)"
+                        }
                     }
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(this, "Error loading CalingaPros: ${exception.message}", Toast.LENGTH_SHORT).show()
-            }
+                    Toast.makeText(this@CareseekerHomeActivity, message, Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(this, "Error loading CalingaPro profiles: ${exception.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
     
     private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val r = 6371 // Radius of the Earth in kilometers
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = sin(dLat / 2) * sin(dLat / 2) +
+                cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+                sin(dLon / 2) * sin(dLon / 2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        return r * c
+    }
+    
+    private fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val r = 3959 // Radius of the Earth in miles
         val dLat = Math.toRadians(lat2 - lat1)
         val dLon = Math.toRadians(lon2 - lon1)
         val a = sin(dLat / 2) * sin(dLat / 2) +
@@ -374,5 +477,6 @@ data class CalingaPro(
     val email: String = "",
     val phone: String = "",
     val latitude: Double = 0.0,
-    val longitude: Double = 0.0
+    val longitude: Double = 0.0,
+    val distanceInMiles: Double = 0.0 // Distance from current user in miles
 )

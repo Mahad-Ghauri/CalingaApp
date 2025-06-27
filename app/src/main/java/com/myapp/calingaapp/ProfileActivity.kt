@@ -9,7 +9,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
-import android.widget.Switch
+//import android.widget.Switch
+import com.google.android.material.switchmaterial.SwitchMaterial
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -26,17 +27,19 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var storage: FirebaseStorage
+    private lateinit var locationManager: LocationManager
     
     private lateinit var profileImage: CircleImageView
     private lateinit var editName: TextInputEditText
     private lateinit var editAge: TextInputEditText
     private lateinit var editAddress: TextInputEditText
     private lateinit var editPhone: TextInputEditText
+    private lateinit var editBio: TextInputEditText
     private lateinit var editEmergencyContact: TextInputEditText
     private lateinit var editMedicalConditions: TextInputEditText
     private lateinit var saveButton: Button
     private lateinit var progressBar: ProgressBar
-    private var activeStatusSwitch: Switch? = null // Optional switch for CalingaPro active status
+    private var activeStatusSwitch: SwitchMaterial? = null // Optional switch for CalingaPro active status
     
     private var photoUri: Uri? = null
     private var profilePhotoUrl: String = ""
@@ -60,6 +63,7 @@ class ProfileActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
+        locationManager = LocationManager(this)
         
         // Set up toolbar
         val toolbar: Toolbar = findViewById(R.id.profile_toolbar)
@@ -73,6 +77,7 @@ class ProfileActivity : AppCompatActivity() {
         editAge = findViewById(R.id.edit_age)
         editAddress = findViewById(R.id.edit_address)
         editPhone = findViewById(R.id.edit_phone)
+        editBio = findViewById(R.id.edit_bio)
         editEmergencyContact = findViewById(R.id.edit_emergency_contact)
         editMedicalConditions = findViewById(R.id.edit_medical_conditions)
         saveButton = findViewById(R.id.btn_save_profile)
@@ -94,6 +99,18 @@ class ProfileActivity : AppCompatActivity() {
         // Set up save button click listener
         saveButton.setOnClickListener {
             saveUserProfile()
+        }
+        
+        // Set up active status switch listener for CalingaPros
+        activeStatusSwitch?.setOnCheckedChangeListener { _, isChecked ->
+            // Update location collection immediately when status changes
+            locationManager.setUserActiveStatus(isChecked) { success, error ->
+                if (!success && error != null) {
+                    Toast.makeText(this, "Failed to update availability: $error", Toast.LENGTH_SHORT).show()
+                    // Revert the switch state
+                    activeStatusSwitch?.isChecked = !isChecked
+                }
+            }
         }
     }
     
@@ -127,6 +144,7 @@ class ProfileActivity : AppCompatActivity() {
                                 editName.setText(userProfile.name)
                                 editAge.setText(if (userProfile.age != null && userProfile.age!! > 0) userProfile.age.toString() else "")
                                 editAddress.setText(userProfile.address)
+                                editBio.setText(userProfile.bio)
                                 // TODO: Phone, emergency contact, and medical conditions need to be added to new schema if needed
                                 // editPhone.setText("")
                                 // editEmergencyContact.setText("")
@@ -170,6 +188,7 @@ class ProfileActivity : AppCompatActivity() {
         val name = editName.text.toString().trim()
         val ageText = editAge.text.toString().trim()
         val address = editAddress.text.toString().trim()
+        val bio = editBio.text.toString().trim()
         val phone = editPhone.text.toString().trim()
         val emergencyContact = editEmergencyContact.text.toString().trim()
         val medicalConditions = editMedicalConditions.text.toString().trim()
@@ -190,7 +209,7 @@ class ProfileActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     storageRef.downloadUrl.addOnSuccessListener { uri ->
                         profilePhotoUrl = uri.toString()
-                        saveProfileData(currentUser.uid, name, age, address, phone, emergencyContact, medicalConditions)
+                        saveProfileData(currentUser.uid, name, age, address, bio, phone, emergencyContact, medicalConditions)
                     }
                 }
                 .addOnFailureListener { e ->
@@ -198,7 +217,7 @@ class ProfileActivity : AppCompatActivity() {
                     showProgress(false)
                 }
         } else {
-            saveProfileData(currentUser.uid, name, age, address, phone, emergencyContact, medicalConditions)
+            saveProfileData(currentUser.uid, name, age, address, bio, phone, emergencyContact, medicalConditions)
         }
     }
     
@@ -207,6 +226,7 @@ class ProfileActivity : AppCompatActivity() {
         name: String, 
         age: Int, 
         address: String, 
+        bio: String,
         phone: String, 
         emergencyContact: String, 
         medicalConditions: String
@@ -217,19 +237,19 @@ class ProfileActivity : AppCompatActivity() {
             "name" to name,
             "age" to if (age > 0) age else null,
             "address" to address,
+            "bio" to bio,
             "profilePhotoUrl" to profilePhotoUrl,
             "isActive" to (activeStatusSwitch?.isChecked ?: userProfile.isActive),
             "latitude" to userProfile.latitude,
             "longitude" to userProfile.longitude,
             "caregiverTier" to userProfile.caregiverTier,
-            "bio" to userProfile.bio,
             "specialties" to userProfile.specialties,
             "isApproved" to userProfile.isApproved,
             "documents" to userProfile.documents,
             "createdAt" to userProfile.createdAt
         )
         
-        // Save to Firestore
+                // Save to Firestore
         db.collection("userProfiles").document(userId)
             .set(updatedProfile)
             .addOnSuccessListener {
@@ -237,9 +257,17 @@ class ProfileActivity : AppCompatActivity() {
                 db.collection("users").document(userId)
                     .update(mapOf("fullName" to name))
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
-                        setResult(Activity.RESULT_OK)
-                        finish()
+                        // Update location collection with new active status for CalingaPros
+                        val isActiveStatus = activeStatusSwitch?.isChecked ?: userProfile.isActive
+                        locationManager.setUserActiveStatus(isActiveStatus) { success, error ->
+                            if (success) {
+                                Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this, "Profile updated but failed to update availability status", Toast.LENGTH_SHORT).show()
+                            }
+                            setResult(Activity.RESULT_OK)
+                            finish()
+                        }
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(this, "Updated profile but failed to update display name", Toast.LENGTH_SHORT).show()

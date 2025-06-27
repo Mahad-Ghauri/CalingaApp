@@ -9,9 +9,9 @@
             android:icon="@drawable/ic_nav_home"
             android:title="Home" />
         <item
-            android:id="@+id/nav_map"
-            android:icon="@drawable/ic_nav_map"
-            android:title="Find Careseekers" />
+            android:id="@+id/nav_bookings"
+            android:icon="@drawable/ic_nav_bookings"
+            android:title="All Bookings" />
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_nav_profile"

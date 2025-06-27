@@ -11,14 +11,15 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F8F9FA">
+        android:background="@color/background_light">
 
+        <!-- Top App Bar -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/toolbar_background"
-            android:elevation="4dp"
+            android:elevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -51,7 +52,7 @@
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:fontFamily="@font/sfpro_bold"
-                    android:text="CALiNGA Care"
+                    android:text="CALiNGA Care Pro"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
@@ -61,46 +62,164 @@
                     android:layout_height="24dp"
                     android:layout_marginEnd="16dp"
                     android:src="@drawable/ic_menu"
-                    app:tint="@color/white" />
+                    app:tint="@color/white"
+                    android:contentDescription="Menu" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 
-        <TextView
-            android:id="@+id/textViewCareseeker"
-            android:layout_width="wrap_content"
+        <!-- Welcome Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/welcomeCard"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:fontFamily="@font/sfpro_bold"
-            android:text="Careseekers"
-            android:textColor="@color/black"
-            android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewCareseekers"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:background="@drawable/gradient_card_background">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome back!"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/sfpro_med" />
+
+                <TextView
+                    android:id="@+id/textViewWelcomeMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ready to help your patients today?"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/sfpro_bold"
+                    android:layout_marginTop="4dp" />
+
+                <!-- Mini Map -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/miniMapCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#E3F2FD">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/map"
+                            android:scaleType="centerCrop"
+                            android:alpha="0.7" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:src="@drawable/ic_location_on"
+                                app:tint="@color/primary_color" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="View Map"
+                                android:textColor="@color/primary_color"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/sfpro_bold"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Today's Bookings Section -->
+        <LinearLayout
+            android:id="@+id/sectionHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toBottomOf="@id/welcomeCard">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/sfpro_bold"
+                android:text="Today's Bookings"
+                android:textColor="@color/text_primary"
+                android:textSize="22sp" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_calendar_today"
+                app:tint="@color/primary_color" />
+        </LinearLayout>
+
+        <!-- Swipe Refresh Layout -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
-            android:clipToPadding="false"
-            android:paddingBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textViewCareseeker"
-            tools:listitem="@layout/item_careseeker" />
+            app:layout_constraintTop_toBottomOf="@id/sectionHeader"
+            app:layout_constraintBottom_toBottomOf="parent">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewCareseekers"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="88dp"
+                tools:listitem="@layout/item_careseeker_modern" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <!-- Floating Action Button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:contentDescription="Search careseekers"
-            android:src="@drawable/ic_search"
-            app:backgroundTint="?attr/colorPrimary"
+            android:contentDescription="Refresh bookings"
+            android:src="@drawable/ic_refresh"
+            app:backgroundTint="@color/primary_color"
+            app:tint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@color/white" />
-    </androidx.constraintlayout.widget.ConstraintLayout>    <com.google.android.material.navigation.NavigationView
+            app:borderWidth="0dp"
+            app:elevation="8dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Navigation Drawer -->
+    <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

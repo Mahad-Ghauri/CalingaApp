@@ -2,24 +2,32 @@ package com.myapp.calingaapp
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
-class BookingActivity : AppCompatActivity() {
+class BookingActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
-      private var selectedDate: String = ""
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
+    
+    private var selectedDate: String = ""
     private var selectedTime: String = ""
     private var selectedPaymentMethod: String = ""
     
@@ -42,15 +50,33 @@ class BookingActivity : AppCompatActivity() {
         "PayPal",
         "Venmo",
         "Zelle",
-        "Bank Transfer",
         "Check"
     )
-      override fun onCreate(savedInstanceState: Bundle?) {
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_booking)
-          // Initialize Firebase
+        
+        // Initialize Firebase
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+        
+        // Initialize views
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
+        
+        // Update navigation header with user info
+        updateNavigationHeader()
+        
+        // Set up menu button click listener
+        findViewById<ImageView>(R.id.imageViewMenu).setOnClickListener {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START)
+            }
+        }
         
         // Get caregiver details from intent
         caregiverName = intent.getStringExtra("caregiver_name") ?: ""
@@ -61,7 +87,8 @@ class BookingActivity : AppCompatActivity() {
         
         setupClickListeners()
     }
-      private fun setupClickListeners() {
+    
+    private fun setupClickListeners() {
         // Back button
         findViewById<ImageView>(R.id.btn_back).setOnClickListener {
             finish()
@@ -90,53 +117,41 @@ class BookingActivity : AppCompatActivity() {
     
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        
         val datePickerDialog = DatePickerDialog(
             this,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                val calendar = Calendar.getInstance()
-                calendar.set(selectedYear, selectedMonth, selectedDay)
-                
-                val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-                selectedDate = dateFormat.format(calendar.time)
-                  findViewById<TextView>(R.id.tv_selected_date).text = selectedDate
+            { _, year, month, dayOfMonth ->
+                selectedDate = "${dayOfMonth}/${month + 1}/${year}"
+                findViewById<TextView>(R.id.tv_selected_date).text = selectedDate
                 findViewById<TextView>(R.id.tv_selected_date).setTextColor(getColor(R.color.black))
             },
-            year, month, day
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
         )
         
         // Set minimum date to today
-        datePickerDialog.datePicker.minDate = System.currentTimeMillis()
+        datePickerDialog.datePicker.minDate = calendar.timeInMillis
         datePickerDialog.show()
     }
     
     private fun showTimePicker() {
         val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
-        
         val timePickerDialog = TimePickerDialog(
             this,
-            { _, selectedHour, selectedMinute ->
-                val calendar = Calendar.getInstance()
-                calendar.set(Calendar.HOUR_OF_DAY, selectedHour)
-                calendar.set(Calendar.MINUTE, selectedMinute)
-                
-                val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-                selectedTime = timeFormat.format(calendar.time)
-                  findViewById<TextView>(R.id.tv_selected_time).text = selectedTime
+            { _, hourOfDay, minute ->
+                selectedTime = "${hourOfDay}:${minute.toString().padStart(2, '0')}"
+                findViewById<TextView>(R.id.tv_selected_time).text = selectedTime
                 findViewById<TextView>(R.id.tv_selected_time).setTextColor(getColor(R.color.black))
             },
-            hour, minute, false
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            false
         )
-        
         timePickerDialog.show()
     }
     
-    private fun showPaymentMethodDialog() {        AlertDialog.Builder(this)
+    private fun showPaymentMethodDialog() {
+        AlertDialog.Builder(this)
             .setTitle("Select Payment Method")
             .setItems(paymentMethods) { _, which ->
                 selectedPaymentMethod = paymentMethods[which]
@@ -149,18 +164,18 @@ class BookingActivity : AppCompatActivity() {
     private fun confirmBooking() {
         // Validate inputs
         if (selectedDate.isEmpty()) {
-            Toast.makeText(this, "Please select a preferred date", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please select a date", Toast.LENGTH_SHORT).show()
             return
         }
         
         if (selectedTime.isEmpty()) {
-            Toast.makeText(this, "Please select a preferred time", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please select a time", Toast.LENGTH_SHORT).show()
             return
         }
         
-        val address = findViewById<TextInputEditText>(R.id.et_address).text.toString().trim()
+        val address = findViewById<TextInputEditText>(R.id.et_address).text.toString()
         if (address.isEmpty()) {
-            Toast.makeText(this, "Please enter the service address", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please enter service address", Toast.LENGTH_SHORT).show()
             return
         }
         
@@ -169,53 +184,152 @@ class BookingActivity : AppCompatActivity() {
             return
         }
         
-        val notes = findViewById<TextInputEditText>(R.id.et_notes).text.toString().trim()
+        val notes = findViewById<TextInputEditText>(R.id.et_notes).text.toString()
         
-        // Create booking data
+        // Create booking object
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "You must be logged in to book", Toast.LENGTH_SHORT).show()
             return
         }
-          val bookingData = hashMapOf(
-            "userId" to currentUser.uid,
-            "userEmail" to currentUser.email,
+        
+        val booking = hashMapOf(
+            "careseekerUid" to currentUser.uid,
             "caregiverName" to caregiverName,
             "caregiverTier" to caregiverTier,
             "caregiverRate" to caregiverRate,
             "caregiverEmail" to caregiverEmail,
             "caregiverPhone" to caregiverPhone,
-            "preferredDate" to selectedDate,
-            "preferredTime" to selectedTime,
+            "selectedDate" to selectedDate,
+            "selectedTime" to selectedTime,
             "serviceAddress" to address,
             "notes" to notes,
             "paymentMethod" to selectedPaymentMethod,
-            "bookingStatus" to "pending",
-            "createdAt" to System.currentTimeMillis(),
-            "timestamp" to com.google.firebase.Timestamp.now()
+            "status" to "pending",
+            "createdAt" to System.currentTimeMillis()
         )
-          // Show loading state
-        findViewById<LinearLayout>(R.id.btn_confirm_booking).isEnabled = false
         
-        // Save to Firebase
+        findViewById<TextView>(R.id.btn_confirm_booking).text = "Booking..."
+        
         firestore.collection("bookings")
-            .add(bookingData)
-            .addOnSuccessListener { documentReference ->
-                Toast.makeText(this, "Booking confirmed successfully!", Toast.LENGTH_LONG).show()
-                  // Show success dialog
-                val caregiverInfo = if (caregiverName.isNotEmpty()) " with $caregiverName" else ""
-                AlertDialog.Builder(this)
-                    .setTitle("Booking Confirmed")
-                    .setMessage("Your appointment has been scheduled$caregiverInfo for $selectedDate at $selectedTime. You will receive a confirmation shortly.")
-                    .setPositiveButton("OK") { _, _ ->
-                        finish()
+            .add(booking)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Booking confirmed! You'll be contacted by $caregiverName soon.", Toast.LENGTH_LONG).show()
+                finish()
+                
+                // Send confirmation email or notification here if needed
+                Toast.makeText(this, "Booking confirmed for $selectedDate at $selectedTime", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Booking failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                findViewById<TextView>(R.id.btn_confirm_booking).text = "Confirm Booking"
+            }
+    }
+    
+    private fun updateNavigationHeader() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val headerView = navigationView.getHeaderView(0)
+            val navHeaderName = headerView.findViewById<TextView>(R.id.nav_header_name)
+            val navHeaderEmail = headerView.findViewById<TextView>(R.id.nav_header_email)
+            
+            navHeaderEmail.text = currentUser.email ?: ""
+            
+            // Load user profile from Firestore
+            firestore.collection("userProfiles").document(currentUser.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val displayName = document.getString("name") ?: "User"
+                        navHeaderName.text = displayName
                     }
-                    .setCancelable(false)
-                    .show()
+                }
+        }
+    }
+    
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_home -> {
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    firestore.collection("users").document(currentUser.uid)
+                        .get()
+                        .addOnSuccessListener { document ->
+                            if (document != null && document.exists()) {
+                                val userRole = document.getString("role")
+                                val intent = if (userRole == "caregiver") {
+                                    Intent(this, CaregiverHomeActivity::class.java)
+                                } else {
+                                    Intent(this, CareseekerHomeActivity::class.java)
+                                }
+                                startActivity(intent)
+                                finish()
+                            }
+                        }
+                }
             }
-            .addOnFailureListener { exception ->
-                Toast.makeText(this, "Failed to confirm booking: ${exception.message}", Toast.LENGTH_LONG).show()
-                findViewById<LinearLayout>(R.id.btn_confirm_booking).isEnabled = true
+            R.id.nav_map -> {
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    firestore.collection("users").document(currentUser.uid)
+                        .get()
+                        .addOnSuccessListener { document ->
+                            if (document != null && document.exists()) {
+                                val userRole = document.getString("role") ?: "careseeker"
+                                val intent = Intent(this, MapActivity::class.java)
+                                intent.putExtra("USER_ROLE", userRole)
+                                startActivity(intent)
+                            }
+                        }
+                }
             }
+            R.id.nav_bookings -> {
+                // Navigate to home screen for now since BookingsActivity doesn't exist
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    firestore.collection("users").document(currentUser.uid)
+                        .get()
+                        .addOnSuccessListener { document ->
+                            if (document != null && document.exists()) {
+                                val userRole = document.getString("role")
+                                val intent = if (userRole == "caregiver") {
+                                    Intent(this, CaregiverHomeActivity::class.java)
+                                } else {
+                                    Intent(this, CareseekerHomeActivity::class.java)
+                                }
+                                startActivity(intent)
+                            }
+                        }
+                }
+            }
+            R.id.nav_profile -> {
+                val intent = Intent(this, ProfileActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.nav_settings -> {
+                // Navigate to profile for now since SettingsActivity doesn't exist
+                val intent = Intent(this, ProfileActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.nav_logout -> {
+                auth.signOut()
+                Toast.makeText(this, "Signed out successfully", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
+        }
+        
+        drawerLayout.closeDrawer(GravityCompat.START)
+        return true
+    }
+    
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
     }
 }

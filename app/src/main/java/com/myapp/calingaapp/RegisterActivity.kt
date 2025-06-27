@@ -199,6 +199,15 @@ class RegisterActivity : AppCompatActivity() {
             isActive = false
         )
         
+        // Create location document for the new user
+        val locationData = LocationData(
+            uid = userId,
+            role = userType,
+            isActive = false, // Will be set to true when user opens the app
+            lastUpdated = System.currentTimeMillis(),
+            location = LocationCoordinates(0.0, 0.0) // Will be updated when location is obtained
+        )
+        
         // Save to Firestore
         db.collection("users").document(userId)
             .set(user.toMap())
@@ -206,14 +215,22 @@ class RegisterActivity : AppCompatActivity() {
                 db.collection("userProfiles").document(userId)
                     .set(userProfile.toMap())
                     .addOnSuccessListener {
-                        if (userType == "calingapro") {
-                            Toast.makeText(this, "Registration successful! Your account will be reviewed and approved.", Toast.LENGTH_LONG).show()
-                        } else {
-                            Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
-                        }
-                        
-                        // Navigate to appropriate home screen
-                        navigateToHome(userType)
+                        // Also create the location document
+                        db.collection("locations").document(userId)
+                            .set(locationData.toMap())
+                            .addOnSuccessListener {
+                                if (userType == "calingapro") {
+                                    Toast.makeText(this, "Registration successful! Your account will be reviewed and approved.", Toast.LENGTH_LONG).show()
+                                } else {
+                                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
+                                }
+                                
+                                // Navigate to appropriate home screen
+                                navigateToHome(userType)
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "Failed to create location data: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(this, "Failed to create profile: ${e.message}", Toast.LENGTH_LONG).show()
