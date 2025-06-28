@@ -15,7 +15,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.cardview.widget.CardView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -32,7 +31,6 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
     private lateinit var recyclerView: RecyclerView
     private lateinit var bookingAdapter: BookingAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var miniMapCard: CardView
     private val bookingList = ArrayList<Booking>()
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
@@ -53,7 +51,6 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.nav_view)
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
-        miniMapCard = findViewById(R.id.miniMapCard)
         
         // Set up navigation with caregiver-specific menu
         navigationView.inflateMenu(R.menu.caregiver_drawer_menu)
@@ -87,13 +84,6 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
             R.color.secondary_color,
             R.color.accent_color
         )
-
-        // Mini map click listener
-        miniMapCard.setOnClickListener {
-            val intent = Intent(this, MapActivity::class.java)
-            intent.putExtra("USER_ROLE", "calingapro")
-            startActivity(intent)
-        }
 
         // Load today's bookings
         loadTodaysBookings()

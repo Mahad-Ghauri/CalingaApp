@@ -22,6 +22,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.cardview.widget.CardView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -44,6 +45,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
     private lateinit var calingaProAdapter: CalingaProAdapter
     private lateinit var editTextSearch: EditText
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var miniMapCard: CardView
     private val calingaProList = ArrayList<CalingaPro>()
     private val filteredList = ArrayList<CalingaPro>()
     
@@ -118,6 +120,14 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
                 filterProfessionals(s.toString())
             }
         })
+
+        // Initialize mini map card
+        miniMapCard = findViewById(R.id.miniMapCard)
+        miniMapCard.setOnClickListener {
+            val intent = Intent(this, MapActivity::class.java)
+            intent.putExtra("USER_ROLE", "careseeker")
+            startActivity(intent)
+        }
 
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recyclerViewCaregivers)
