@@ -282,6 +282,7 @@
                         android:focusable="true">
 
                         <TextView
+                            android:id="@+id/tv_confirm_booking_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Confirm Booking"

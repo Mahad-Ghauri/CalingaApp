@@ -70,7 +70,7 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Set up adapter for bookings
-        bookingAdapter = BookingAdapter(bookingList)
+        bookingAdapter = BookingAdapter(bookingList, this)
         recyclerView.adapter = bookingAdapter
 
         // Set up swipe refresh

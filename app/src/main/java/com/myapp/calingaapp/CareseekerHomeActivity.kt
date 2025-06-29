@@ -351,6 +351,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
                         }
                         
                         val calingaPro = CalingaPro(
+                            uid = userProfile.userId, // Add the caregiver UID
                             name = userProfile.name,
                             tier = userProfile.caregiverTier,
                             address = userProfile.address,
@@ -441,6 +442,11 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
                 intent.putExtra("USER_ROLE", "careseeker")
                 startActivity(intent)
             }
+            R.id.nav_bookings -> {
+                // Launch bookings activity for careseeker
+                val intent = Intent(this, CareseekerBookingsActivity::class.java)
+                startActivity(intent)
+            }
             R.id.nav_profile -> {
                 // Launch profile activity
                 val intent = Intent(this, ProfileActivity::class.java)
@@ -474,6 +480,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
 
 // Data class for CALINGApro items
 data class CalingaPro(
+    val uid: String, // Caregiver's unique ID from Firebase
     val name: String,
     val tier: String,
     val address: String,

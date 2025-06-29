@@ -186,43 +186,82 @@ class BookingActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         
         val notes = findViewById<TextInputEditText>(R.id.et_notes).text.toString()
         
-        // Create booking object
+        // Create booking object using the proper Booking data model
         val currentUser = auth.currentUser
         if (currentUser == null) {
             Toast.makeText(this, "You must be logged in to book", Toast.LENGTH_SHORT).show()
             return
         }
-        
-        val booking = hashMapOf(
-            "careseekerUid" to currentUser.uid,
-            "caregiverName" to caregiverName,
-            "caregiverTier" to caregiverTier,
-            "caregiverRate" to caregiverRate,
-            "caregiverEmail" to caregiverEmail,
-            "caregiverPhone" to caregiverPhone,
-            "selectedDate" to selectedDate,
-            "selectedTime" to selectedTime,
-            "serviceAddress" to address,
-            "notes" to notes,
-            "paymentMethod" to selectedPaymentMethod,
-            "status" to "pending",
-            "createdAt" to System.currentTimeMillis()
+
+        // Get caregiver ID from intent
+        val caregiverUid = intent.getStringExtra("caregiver_uid") ?: ""
+        if (caregiverUid.isEmpty()) {
+            Toast.makeText(this, "Caregiver information missing", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Format date properly
+        val formattedDate = try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+            val date = inputFormat.parse(selectedDate)
+            outputFormat.format(date ?: Date())
+        } catch (e: Exception) {
+            selectedDate // Fallback to original format
+        }
+
+        // Create new booking using proper Booking data model
+        val bookingId = firestore.collection("bookings").document().id
+        val booking = Booking(
+            bookingId = bookingId,
+            careseekerId = currentUser.uid,
+            calingaproId = caregiverUid,
+            caregiverTier = caregiverTier,
+            date = formattedDate,
+            time = selectedTime,
+            address = address,
+            notes = notes,
+            ratePerHour = caregiverRate.toDouble(),
+            totalAmount = caregiverRate.toDouble(), // Can be calculated based on hours
+            status = "pending",
+            createdAt = com.google.firebase.Timestamp.now()
         )
         
-        findViewById<TextView>(R.id.btn_confirm_booking).text = "Booking..."
+        findViewById<TextView>(R.id.tv_confirm_booking_text).text = "Booking..."
         
         firestore.collection("bookings")
-            .add(booking)
+            .document(bookingId)
+            .set(booking.toMap())
             .addOnSuccessListener {
                 Toast.makeText(this, "Booking confirmed! You'll be contacted by $caregiverName soon.", Toast.LENGTH_LONG).show()
-                finish()
                 
-                // Send confirmation email or notification here if needed
-                Toast.makeText(this, "Booking confirmed for $selectedDate at $selectedTime", Toast.LENGTH_SHORT).show()
+                // Create notification for the caregiver
+                createNotificationForCaregiver(caregiverUid, formattedDate, selectedTime)
+                
+                finish()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Booking failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                findViewById<TextView>(R.id.btn_confirm_booking).text = "Confirm Booking"
+                findViewById<TextView>(R.id.tv_confirm_booking_text).text = "Confirm Booking"
+            }
+    }
+
+    private fun createNotificationForCaregiver(caregiverUid: String, date: String, time: String) {
+        val notificationId = firestore.collection("notifications").document().id
+        val notification = Notification(
+            notificationId = notificationId,
+            userId = caregiverUid,
+            title = "New Booking Request",
+            message = "You have a new booking request for $date at $time",
+            seen = false,
+            timestamp = com.google.firebase.Timestamp.now()
+        )
+        
+        firestore.collection("notifications")
+            .document(notificationId)
+            .set(notification.toMap())
+            .addOnFailureListener {
+                // Log error but don't show to user as booking was successful
             }
     }
     

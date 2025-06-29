@@ -50,6 +50,7 @@ class CalingaProAdapter(private val calingaProList: List<CalingaPro>) :
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, CalingaProActivity::class.java).apply {
+                putExtra(EXTRA_CAREGIVER_UID, currentItem.uid) // Add the UID
                 putExtra(EXTRA_CAREGIVER_NAME, currentItem.name)
                 putExtra(EXTRA_CAREGIVER_TIER, currentItem.tier)
                 putExtra(EXTRA_CAREGIVER_ADDRESS, currentItem.address)
@@ -79,6 +80,7 @@ class CalingaProAdapter(private val calingaProList: List<CalingaPro>) :
     }
     
     companion object {
+        const val EXTRA_CAREGIVER_UID = "extra_caregiver_uid"
         const val EXTRA_CAREGIVER_NAME = "extra_caregiver_name"
         const val EXTRA_CAREGIVER_TIER = "extra_caregiver_tier"
         const val EXTRA_CAREGIVER_ADDRESS = "extra_caregiver_address"

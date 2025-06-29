@@ -37,12 +37,14 @@ data class Booking(
     val ratePerHour: Double = 0.0,
     val totalAmount: Double = 0.0,
     val status: String = "pending", // "pending" | "accepted" | "completed" | "cancelled"
-    val createdAt: Timestamp = Timestamp.now()
+    val completionNotes: String = "", // Notes added when service is completed
+    val createdAt: Timestamp = Timestamp.now(),
+    val completedAt: Timestamp? = null // Timestamp when service was completed
 ) {
-    constructor() : this("", "", "", "", "", "", "", "", 0.0, 0.0, "pending", Timestamp.now())
+    constructor() : this("", "", "", "", "", "", "", "", 0.0, 0.0, "pending", "", Timestamp.now(), null)
     
     fun toMap(): Map<String, Any> {
-        return mapOf(
+        val map = mutableMapOf<String, Any>(
             "bookingId" to bookingId,
             "careseekerId" to careseekerId,
             "calingaproId" to calingaproId,
@@ -54,8 +56,13 @@ data class Booking(
             "ratePerHour" to ratePerHour,
             "totalAmount" to totalAmount,
             "status" to status,
+            "completionNotes" to completionNotes,
             "createdAt" to createdAt
         )
+        
+        completedAt?.let { map["completedAt"] = it }
+        
+        return map
     }
 }
 

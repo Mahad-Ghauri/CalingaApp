@@ -14,6 +14,7 @@ class CalingaProActivity : AppCompatActivity() {
         setContentView(R.layout.activity_calinga_pro)
         
         // Extract caregiver details from intent
+        val uid = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_UID) ?: ""
         val name = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_NAME) ?: "Unknown Caregiver"
         val tier = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_TIER) ?: ""
         val address = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_ADDRESS) ?: ""
@@ -43,6 +44,7 @@ class CalingaProActivity : AppCompatActivity() {
         findViewById<Button>(R.id.buttonBookAppointment).setOnClickListener {
             val intent = Intent(this, BookingActivity::class.java).apply {
                 // Pass caregiver details to the booking activity
+                putExtra("caregiver_uid", uid) // Add the missing UID
                 putExtra("caregiver_name", name)
                 putExtra("caregiver_tier", tier)
                 putExtra("caregiver_rate", rate)
