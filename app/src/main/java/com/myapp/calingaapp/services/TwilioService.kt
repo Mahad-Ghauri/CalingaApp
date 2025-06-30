@@ -4,6 +4,7 @@ import android.content.Context
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 import kotlin.random.Random
@@ -160,15 +161,33 @@ class TwilioService(private val context: Context) {
                 android.util.Log.d("TwilioService", "Verify response code: ${response.code}")
                 android.util.Log.d("TwilioService", "Verify response body: $responseBody")
                 
-                if (response.isSuccessful && responseBody?.contains("\"status\":\"approved\"") == true) {
-                    callback(true, "Phone number verified successfully")
+                if (response.isSuccessful && !responseBody.isNullOrEmpty()) {
+                    try {
+                        val jsonResponse = JSONObject(responseBody)
+                        val status = jsonResponse.optString("status", "")
+                        val valid = jsonResponse.optBoolean("valid", false)
+                        
+                        android.util.Log.d("TwilioService", "Parsed status: $status, valid: $valid")
+                        
+                        if (status == "approved" && valid) {
+                            android.util.Log.d("TwilioService", "Verification successful!")
+                            callback(true, "Phone number verified successfully")
+                        } else {
+                            android.util.Log.w("TwilioService", "Verification failed - status: $status, valid: $valid")
+                            callback(false, "Invalid OTP or verification failed")
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("TwilioService", "Error parsing verification response", e)
+                        callback(false, "Error processing verification response")
+                    }
                 } else {
                     val errorMessage = when (response.code) {
                         400 -> "Invalid verification code"
                         404 -> "Verification not found or expired"
                         429 -> "Too many verification attempts"
-                        else -> "Invalid OTP or verification expired"
+                        else -> "Failed to verify OTP (${response.code}): ${responseBody ?: response.message}"
                     }
+                    android.util.Log.w("TwilioService", "Verification failed with code ${response.code}: $errorMessage")
                     callback(false, errorMessage)
                 }
             }
