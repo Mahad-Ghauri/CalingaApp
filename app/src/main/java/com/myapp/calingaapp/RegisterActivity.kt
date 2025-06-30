@@ -4,10 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +28,8 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var editTextPhone: EditText
     private lateinit var editTextPassword: EditText
     private lateinit var editTextRepeatPassword: EditText
+    private lateinit var spinnerCountryCode: Spinner
+    private lateinit var checkBoxTerms: CheckBox
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,40 +51,30 @@ class RegisterActivity : AppCompatActivity() {
         editTextPhone = findViewById(R.id.editTextPhone)
         editTextPassword = findViewById(R.id.editTextPassword)
         editTextRepeatPassword = findViewById(R.id.editTextRepeatPassword)
+        spinnerCountryCode = findViewById(R.id.spinnerCountryCode)
+        checkBoxTerms = findViewById(R.id.checkBoxTerms)
         val radioGroupUserType = findViewById<RadioGroup>(R.id.radioGroupUserType)
         val radioButtonCareseeker = findViewById<RadioButton>(R.id.radioButtonCareseeker)
         val buttonCreateAccount = findViewById<Button>(R.id.buttonCreateAccount)
         val textViewLogIn = findViewById<TextView>(R.id.textViewLogIn)
         
-        // Auto-format phone number with +63 prefix (optional until OTP is implemented)
-        editTextPhone.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val text = s.toString()
-                // Optional: Auto-add +63 prefix for convenience
-                if (!text.startsWith("+63") && text.isNotEmpty() && text.startsWith("9")) {
-                    editTextPhone.setText("+63$text")
-                    editTextPhone.setSelection(editTextPhone.text.length)
-                }
-            }
-        })
+        // Setup country code spinner
+        setupCountryCodeSpinner()
         
         // Set click listener for create account button
         buttonCreateAccount.setOnClickListener {
             val fullName = editTextFullName.text.toString().trim()
             val email = editTextEmail.text.toString().trim()
-            val phone = editTextPhone.text.toString().trim()
+            val selectedCountryCode = spinnerCountryCode.selectedItem.toString()
+            val phoneNumber = editTextPhone.text.toString().trim()
+            val completePhone = selectedCountryCode + phoneNumber
             val password = editTextPassword.text.toString().trim()
             val confirmPassword = editTextRepeatPassword.text.toString().trim()
             val userType = if (radioButtonCareseeker.isChecked) "careseeker" else "calingapro"
             
-            if (validateInputs(fullName, email, phone, password, confirmPassword)) {
-                // Skip OTP for now - directly create account
-                registerUserDirectly(fullName, email, phone, password, userType)
-                
-                // TODO: When Firebase Phone Auth is approved, use this instead:
-                // navigateToPhoneAuth(fullName, email, phone, password, userType)
+            if (validateInputs(fullName, email, completePhone, password, confirmPassword)) {
+                // Navigate to Phone Auth for OTP verification
+                navigateToPhoneAuth(fullName, email, completePhone, password, userType)
             }
         }
         
@@ -89,6 +84,26 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+    
+    private fun setupCountryCodeSpinner() {
+        val countryCodes = resources.getStringArray(R.array.country_codes)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, countryCodes)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCountryCode.adapter = adapter
+        // Default to +63 (Philippines)
+        spinnerCountryCode.setSelection(1)
+    }
+    
+    private fun navigateToPhoneAuth(fullName: String, email: String, phone: String, password: String, userType: String) {
+        val intent = Intent(this, PhoneAuthActivity::class.java).apply {
+            putExtra("fullName", fullName)
+            putExtra("email", email)
+            putExtra("phone", phone)
+            putExtra("password", password)
+            putExtra("userType", userType)
+        }
+        startActivity(intent)
     }
     
     private fun validateInputs(fullName: String, email: String, phone: String, password: String, confirmPassword: String): Boolean {
@@ -110,14 +125,7 @@ class RegisterActivity : AppCompatActivity() {
             return false
         }
         
-        if (phone.isEmpty()) {
-            editTextPhone.error = "Phone number is required"
-            editTextPhone.requestFocus()
-            return false
-        }
-        
-        // Relax phone validation since we're not doing OTP verification yet
-        if (phone.length < 10) {
+        if (phone.length < 12) { // +63 or +1 + 10 digits minimum
             editTextPhone.error = "Please enter a valid phone number"
             editTextPhone.requestFocus()
             return false
@@ -130,14 +138,8 @@ class RegisterActivity : AppCompatActivity() {
         }
         
         if (password.length < 6) {
-            editTextPassword.error = "Password should be at least 6 characters"
+            editTextPassword.error = "Password must be at least 6 characters"
             editTextPassword.requestFocus()
-            return false
-        }
-        
-        if (confirmPassword.isEmpty()) {
-            editTextRepeatPassword.error = "Please confirm your password"
-            editTextRepeatPassword.requestFocus()
             return false
         }
         
@@ -147,123 +149,11 @@ class RegisterActivity : AppCompatActivity() {
             return false
         }
         
+        if (!checkBoxTerms.isChecked) {
+            Toast.makeText(this, "Please accept the Terms and Conditions and Privacy Policy", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        
         return true
     }
-    
-    private fun navigateToPhoneAuth(fullName: String, email: String, phone: String, password: String, userType: String) {
-        val intent = Intent(this, PhoneAuthActivity::class.java).apply {
-            putExtra("fullName", fullName)
-            putExtra("email", email)
-            putExtra("phone", phone)
-            putExtra("password", password)
-            putExtra("role", userType)
-        }
-        startActivity(intent)
-    }
-    
-    private fun registerUserDirectly(fullName: String, email: String, phone: String, password: String, userType: String) {
-        // Show progress
-        // You can add a progress bar here if needed
-        
-        // Create user with email and password
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val currentUser = auth.currentUser
-                    if (currentUser != null) {
-                        createUserDocumentsDirectly(currentUser.uid, fullName, email, phone, userType)
-                    } else {
-                        Toast.makeText(this, "User creation failed", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                }
-            }
-    }
-    
-    private fun createUserDocumentsDirectly(userId: String, fullName: String, email: String, phone: String, userType: String) {
-        // Create user document
-        val user = User(
-            uid = userId,
-            fullName = fullName,
-            email = email,
-            mobileNumber = phone,
-            role = userType
-        )
-        
-        // Create userProfile document
-        val userProfile = UserProfile(
-            userId = userId,
-            name = fullName,
-            isApproved = if (userType == "calingapro") false else true, // CalingaPros need approval
-            isActive = false
-        )
-        
-        // Create location document for the new user
-        val locationData = LocationData(
-            uid = userId,
-            role = userType,
-            isActive = false, // Will be set to true when user opens the app
-            lastUpdated = System.currentTimeMillis(),
-            location = LocationCoordinates(0.0, 0.0) // Will be updated when location is obtained
-        )
-        
-        // Save to Firestore
-        db.collection("users").document(userId)
-            .set(user.toMap())
-            .addOnSuccessListener {
-                db.collection("userProfiles").document(userId)
-                    .set(userProfile.toMap())
-                    .addOnSuccessListener {
-                        // Also create the location document
-                        db.collection("locations").document(userId)
-                            .set(locationData.toMap())
-                            .addOnSuccessListener {
-                                if (userType == "calingapro") {
-                                    Toast.makeText(this, "Registration successful! Your account will be reviewed and approved.", Toast.LENGTH_LONG).show()
-                                } else {
-                                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
-                                }
-                                
-                                // Navigate to appropriate home screen
-                                navigateToHome(userType)
-                            }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, "Failed to create location data: ${e.message}", Toast.LENGTH_LONG).show()
-                            }
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(this, "Failed to create profile: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to create user: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-    }
-    
-    private fun navigateToHome(userType: String) {
-        val intent = when (userType) {
-            "careseeker" -> Intent(this, CareseekerHomeActivity::class.java)
-            "calingapro" -> Intent(this, CaregiverHomeActivity::class.java)
-            else -> Intent(this, LoginActivity::class.java)
-        }
-        
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
-    }
-    
-    // TODO: Re-enable this when Firebase Phone Auth is approved
-    /*
-    private fun navigateToPhoneAuth(fullName: String, email: String, phone: String, password: String, userType: String) {
-        val intent = Intent(this, PhoneAuthActivity::class.java).apply {
-            putExtra("fullName", fullName)
-            putExtra("email", email)
-            putExtra("phone", phone)
-            putExtra("password", password)
-            putExtra("role", userType)
-        }
-        startActivity(intent)
-    }
-    */
 }

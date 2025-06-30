@@ -29,4 +29,15 @@
     <string name="submit_documents">Submit Documents for Review</string>
     <string name="upload_document">Upload Document</string>
     <string name="view_document">View Document</string>
+    
+    <!-- Country codes for phone registration -->
+    <string-array name="country_codes">
+        <item>+1</item>
+        <item>+63</item>
+    </string-array>
+    
+    <string-array name="country_names">
+        <item>United States</item>
+        <item>Philippines</item>
+    </string-array>
 </resources>

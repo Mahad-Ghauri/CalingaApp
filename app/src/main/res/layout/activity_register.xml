@@ -6,27 +6,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_background"
-    android:padding="16dp"
     tools:context=".RegisterActivity">
 
-    <androidx.cardview.widget.CardView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="20dp">
+
+            <!-- Logo -->
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="12dp"
+                android:src="@drawable/logoo"
+                android:contentDescription="Calinga App Logo" />
+
+            <!-- Welcome Text -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Create Account"
+                android:textColor="@color/black"
+                android:fontFamily="@font/sfpro_bold"
+                android:textSize="22sp"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Join the Calinga community"
+                android:textColor="@color/text_gray"
+                android:fontFamily="@font/sfpro_med"
+                android:textSize="14sp"
+                android:layout_marginBottom="20dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -41,12 +78,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="12dp"
                 android:background="@drawable/edit_text_background"
                 android:hint="Enter your full name"
                 android:fontFamily="@font/sfpro_med"
                 android:inputType="textPersonName"
-                android:padding="16dp"
+                android:padding="14dp"
                 android:textSize="16sp" />
 
             <TextView
@@ -62,12 +99,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="12dp"
                 android:background="@drawable/edit_text_background"
                 android:hint="Enter your email address"
                 android:fontFamily="@font/sfpro_med"
                 android:inputType="textEmailAddress"
-                android:padding="16dp"
+                android:padding="14dp"
                 android:textSize="16sp" />
 
             <TextView
@@ -78,23 +115,39 @@
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
-            <EditText
-                android:id="@+id/editTextPhone"
+            <!-- Country Code and Phone Number Layout -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/edit_text_background"
-                android:hint="Enter your phone number"
-                android:fontFamily="@font/sfpro_med"
-                android:inputType="phone"
-                android:padding="16dp"
-                android:textSize="16sp" />
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/spinnerCountryCode"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/edit_text_background"
+                    android:padding="14dp" />
+
+                <EditText
+                    android:id="@+id/editTextPhone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_background"
+                    android:hint="Enter your phone number"
+                    android:fontFamily="@font/sfpro_med"
+                    android:inputType="phone"
+                    android:padding="14dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:fontFamily="@font/sfpro_bold"
                 android:text="@string/password"
                 android:textColor="@color/black"
@@ -107,13 +160,13 @@
                 android:layout_marginTop="4dp"
                 android:background="@drawable/edit_text_background"
                 android:inputType="textPassword"
-                android:padding="16dp"
+                android:padding="14dp"
                 android:textSize="16sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:text="@string/repeat_password"
                 android:textColor="@color/black"
                 android:fontFamily="@font/sfpro_bold"
@@ -126,14 +179,14 @@
                 android:layout_marginTop="4dp"
                 android:background="@drawable/edit_text_background"
                 android:inputType="textPassword"
-                android:padding="16dp"
+                android:padding="14dp"
                 android:textSize="16sp" />
 
             <RadioGroup
                 android:id="@+id/radioGroupUserType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
                 <RadioButton
@@ -145,7 +198,8 @@
                     android:checked="true"
                     android:fontFamily="@font/sfpro_med"
                     android:text="@string/i_am_a_careseeker"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
 
                 <RadioButton
                     android:id="@+id/radioButtonCalingaPro"
@@ -154,14 +208,27 @@
                     android:buttonTint="@color/radio_button_tint"
                     android:fontFamily="@font/sfpro_med"
                     android:text="@string/i_am_a_calingapro"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
             </RadioGroup>
+
+            <!-- Terms and Conditions Checkbox -->
+            <CheckBox
+                android:id="@+id/checkBoxTerms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/sfpro_med"
+                android:text="I agree to the Terms and Conditions and Privacy Policy"
+                android:textColor="@color/black"
+                android:textSize="13sp"
+                android:buttonTint="@color/radio_button_tint" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/buttonCreateAccount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/button_background"
                 android:padding="14dp"
                 android:text="@string/create_account"
@@ -195,5 +262,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

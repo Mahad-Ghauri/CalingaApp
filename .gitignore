@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Twilio credentials - DO NOT COMMIT
+twilio.properties
+app/src/main/assets/twilio.properties

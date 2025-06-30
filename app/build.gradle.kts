@@ -34,6 +34,20 @@ android {
     kotlinOptions {
         jvmTarget = "17" // Update to match Java version
     }
+    
+    // Add packaging options to handle duplicate files
+    packaging {
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/license.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/notice.txt"
+            excludes += "META-INF/ASL2.0"
+        }
+    }
 }
 
 dependencies {
@@ -60,6 +74,12 @@ dependencies {
     
     // Google Play Services Location for location services
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    
+    // Twilio SDK for SMS
+    implementation("com.twilio.sdk:twilio:10.2.1")
+    
+    // OkHttp for HTTP requests (required for Twilio)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

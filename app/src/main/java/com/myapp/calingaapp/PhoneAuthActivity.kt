@@ -3,9 +3,6 @@ package com.myapp.calingaapp
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -13,31 +10,29 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.FirebaseException
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.concurrent.TimeUnit
+import com.myapp.calingaapp.services.TwilioService
 
 class PhoneAuthActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+    private lateinit var twilioService: TwilioService
     
-    private lateinit var phoneNumberEditText: EditText
     private lateinit var otpEditText: EditText
+    private lateinit var tilOtp: TextInputLayout
     private lateinit var sendOtpButton: Button
     private lateinit var verifyOtpButton: Button
     private lateinit var resendOtpButton: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var timerTextView: TextView
     private lateinit var statusTextView: TextView
+    private lateinit var phoneDisplayTextView: TextView
     
-    private var verificationId: String? = null
-    private var resendToken: PhoneAuthProvider.ForceResendingToken? = null
     private var countDownTimer: CountDownTimer? = null
+    private var isOtpSent: Boolean = false
     
     // Data passed from RegisterActivity
     private var fullName: String = ""
@@ -54,333 +49,192 @@ class PhoneAuthActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
         
-        // Get data from RegisterActivity
+        // Initialize Twilio service
+        twilioService = TwilioService(this)
+        
+        // Get data from intent
         fullName = intent.getStringExtra("fullName") ?: ""
         email = intent.getStringExtra("email") ?: ""
         phone = intent.getStringExtra("phone") ?: ""
         password = intent.getStringExtra("password") ?: ""
-        role = intent.getStringExtra("role") ?: ""
+        role = intent.getStringExtra("userType") ?: ""
         
-        initViews()
+        initializeViews()
         setupListeners()
         
-        // Pre-fill phone number and automatically send OTP
-        if (phone.isNotEmpty()) {
-            phoneNumberEditText.setText(phone)
-            phoneNumberEditText.isEnabled = false // Disable editing since it's already validated
-            sendOtp(phone)
-        }
+        // Display phone number
+        phoneDisplayTextView.text = "We'll send an OTP to $phone"
     }
     
-    private fun initViews() {
-        phoneNumberEditText = findViewById(R.id.et_phone_number)
+    private fun initializeViews() {
         otpEditText = findViewById(R.id.et_otp)
+        tilOtp = findViewById(R.id.til_otp)
         sendOtpButton = findViewById(R.id.btn_send_otp)
         verifyOtpButton = findViewById(R.id.btn_verify_otp)
         resendOtpButton = findViewById(R.id.btn_resend_otp)
         progressBar = findViewById(R.id.progress_bar)
         timerTextView = findViewById(R.id.tv_timer)
         statusTextView = findViewById(R.id.tv_status)
-        
-        // Initially hide OTP section
-        otpEditText.visibility = View.GONE
-        verifyOtpButton.visibility = View.GONE
-        resendOtpButton.visibility = View.GONE
-        timerTextView.visibility = View.GONE
+        phoneDisplayTextView = findViewById(R.id.tv_phone_display)
     }
     
     private fun setupListeners() {
         sendOtpButton.setOnClickListener {
-            val phoneNumber = phoneNumberEditText.text.toString().trim()
-            if (validatePhoneNumber(phoneNumber)) {
-                sendOtp(phoneNumber)
-            }
+            sendOtp()
         }
         
         verifyOtpButton.setOnClickListener {
-            val otp = otpEditText.text.toString().trim()
-            if (validateOtp(otp)) {
-                verifyOtp(otp)
-            }
+            verifyOtp()
         }
         
         resendOtpButton.setOnClickListener {
-            val phoneNumber = phoneNumberEditText.text.toString().trim()
-            resendOtp(phoneNumber)
-        }
-        
-        // Auto-format phone number
-        phoneNumberEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val text = s.toString()
-                if (!text.startsWith("+63") && text.isNotEmpty()) {
-                    phoneNumberEditText.setText("+63$text")
-                    phoneNumberEditText.setSelection(phoneNumberEditText.text.length)
-                }
-            }
-        })
-    }
-    
-    private fun validatePhoneNumber(phoneNumber: String): Boolean {
-        return when {
-            phoneNumber.isEmpty() -> {
-                phoneNumberEditText.error = "Phone number is required"
-                false
-            }
-            !phoneNumber.startsWith("+63") -> {
-                phoneNumberEditText.error = "Please use Philippine format (+63)"
-                false
-            }
-            phoneNumber.length < 13 -> {
-                phoneNumberEditText.error = "Please enter a valid Philippine phone number"
-                false
-            }
-            else -> true
+            sendOtp()
         }
     }
     
-    private fun validateOtp(otp: String): Boolean {
-        return when {
-            otp.isEmpty() -> {
-                otpEditText.error = "OTP is required"
-                false
-            }
-            otp.length != 6 -> {
-                otpEditText.error = "OTP must be 6 digits"
-                false
-            }
-            else -> true
-        }
-    }
-    
-    private fun sendOtp(phoneNumber: String) {
+    private fun sendOtp() {
         showProgress(true)
-        statusTextView.text = "Sending OTP..."
+        updateStatus("Sending OTP...")
         
-        val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(phoneNumber)
-            .setTimeout(60L, TimeUnit.SECONDS)
-            .setActivity(this)
-            .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                    Log.d("PhoneAuth", "onVerificationCompleted: $credential")
-                    signInWithPhoneAuthCredential(credential)
-                }
-                
-                override fun onVerificationFailed(e: FirebaseException) {
-                    Log.w("PhoneAuth", "onVerificationFailed", e)
-                    showProgress(false)
-                    statusTextView.text = "Verification failed: ${e.message}"
-                    Toast.makeText(this@PhoneAuthActivity, "Verification failed: ${e.message}", Toast.LENGTH_LONG).show()
-                }
-                
-                override fun onCodeSent(
-                    verificationId: String,
-                    token: PhoneAuthProvider.ForceResendingToken
-                ) {
-                    Log.d("PhoneAuth", "onCodeSent: $verificationId")
-                    this@PhoneAuthActivity.verificationId = verificationId
-                    this@PhoneAuthActivity.resendToken = token
-                    
-                    showProgress(false)
+        twilioService.sendOtp(phone) { success, message ->
+            runOnUiThread {
+                showProgress(false)
+                if (success) {
+                    isOtpSent = true
+                    updateStatus("OTP sent to $phone")
                     showOtpSection()
-                    startTimer()
-                    statusTextView.text = "OTP sent to $phoneNumber"
-                    Toast.makeText(this@PhoneAuthActivity, "OTP sent!", Toast.LENGTH_SHORT).show()
+                    startCountdown()
+                } else {
+                    updateStatus("Failed to send OTP: $message")
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                 }
-            })
-            .build()
-        
-        PhoneAuthProvider.verifyPhoneNumber(options)
+            }
+        }
     }
     
-    private fun resendOtp(phoneNumber: String) {
-        if (resendToken == null) {
-            Toast.makeText(this, "Cannot resend OTP at this time", Toast.LENGTH_SHORT).show()
+    private fun verifyOtp() {
+        val enteredOtp = otpEditText.text.toString().trim()
+        
+        if (enteredOtp.length != 6) {
+            otpEditText.error = "Please enter a valid 6-digit OTP"
             return
         }
         
         showProgress(true)
-        statusTextView.text = "Resending OTP..."
+        updateStatus("Verifying OTP...")
         
-        val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(phoneNumber)
-            .setTimeout(60L, TimeUnit.SECONDS)
-            .setActivity(this)
-            .setForceResendingToken(resendToken!!)
-            .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                    signInWithPhoneAuthCredential(credential)
+        twilioService.verifyOtp(phone, enteredOtp) { success, message ->
+            runOnUiThread {
+                showProgress(false)
+                if (success) {
+                    updateStatus("Phone verified! Creating account...")
+                    createUserAccount()
+                } else {
+                    updateStatus("Verification failed: $message")
+                    otpEditText.error = message
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                 }
-                
-                override fun onVerificationFailed(e: FirebaseException) {
-                    showProgress(false)
-                    statusTextView.text = "Resend failed: ${e.message}"
-                    Toast.makeText(this@PhoneAuthActivity, "Resend failed: ${e.message}", Toast.LENGTH_LONG).show()
-                }
-                
-                override fun onCodeSent(
-                    verificationId: String,
-                    token: PhoneAuthProvider.ForceResendingToken
-                ) {
-                    this@PhoneAuthActivity.verificationId = verificationId
-                    this@PhoneAuthActivity.resendToken = token
-                    
-                    showProgress(false)
-                    startTimer()
-                    statusTextView.text = "OTP resent to $phoneNumber"
-                    Toast.makeText(this@PhoneAuthActivity, "OTP resent!", Toast.LENGTH_SHORT).show()
-                }
-            })
-            .build()
-        
-        PhoneAuthProvider.verifyPhoneNumber(options)
-    }
-    
-    private fun verifyOtp(otp: String) {
-        if (verificationId == null) {
-            Toast.makeText(this, "Please request OTP first", Toast.LENGTH_SHORT).show()
-            return
+            }
         }
-        
-        showProgress(true)
-        statusTextView.text = "Verifying OTP..."
-        
-        val credential = PhoneAuthProvider.getCredential(verificationId!!, otp)
-        signInWithPhoneAuthCredential(credential)
     }
     
-    private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
-        // First create user with email and password
+    private fun createUserAccount() {
+        showProgress(true)
+        updateStatus("Creating your account...")
+        
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Link phone credential to email account
                     val user = auth.currentUser
-                    user?.linkWithCredential(credential)
-                        ?.addOnCompleteListener { linkTask ->
-                            if (linkTask.isSuccessful) {
-                                createUserDocuments()
-                            } else {
-                                Log.w("PhoneAuth", "linkWithCredential:failure", linkTask.exception)
-                                // If linking fails, still create documents (email auth was successful)
-                                createUserDocuments()
-                            }
-                        }
+                    if (user != null) {
+                        saveUserDataToFirestore(user.uid)
+                    }
                 } else {
-                    Log.w("PhoneAuth", "createUserWithEmailAndPassword:failure", task.exception)
                     showProgress(false)
-                    statusTextView.text = "Registration failed: ${task.exception?.message}"
-                    Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    updateStatus("Failed to create account")
+                    Toast.makeText(baseContext, "Authentication failed: ${task.exception?.message}",
+                        Toast.LENGTH_SHORT).show()
                 }
             }
     }
     
-    private fun createUserDocuments() {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            showProgress(false)
-            Toast.makeText(this, "User authentication failed", Toast.LENGTH_SHORT).show()
-            return
-        }
-        
-        // Use the phone number from the intent (already validated)
-        val phoneNumber = phone
-        
-        // Create user document
-        val user = User(
-            uid = currentUser.uid,
-            fullName = fullName,
-            email = email,
-            mobileNumber = phoneNumber,
-            role = role
+    private fun saveUserDataToFirestore(userId: String) {
+        val userData = hashMapOf(
+            "fullName" to fullName,
+            "email" to email,
+            "phone" to phone,
+            "role" to role,
+            "isPhoneVerified" to true,
+            "createdAt" to System.currentTimeMillis(),
+            "isActive" to true
         )
         
-        // Create userProfile document
-        val userProfile = UserProfile(
-            userId = currentUser.uid,
-            name = fullName,
-            isApproved = if (role == "calingapro") false else true, // CalingaPros need approval
-            isActive = false
-        )
-        
-        // Save to Firestore
-        db.collection("users").document(currentUser.uid)
-            .set(user.toMap())
+        db.collection("users").document(userId)
+            .set(userData)
             .addOnSuccessListener {
-                db.collection("userProfiles").document(currentUser.uid)
-                    .set(userProfile.toMap())
-                    .addOnSuccessListener {
-                        showProgress(false)
-                        statusTextView.text = "Registration successful!"
-                        
-                        if (role == "calingapro") {
-                            Toast.makeText(this, "Registration successful! Your account will be reviewed and approved.", Toast.LENGTH_LONG).show()
-                        } else {
-                            Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
-                        }
-                        
-                        // Navigate to appropriate home screen
-                        navigateToHome()
-                    }
-                    .addOnFailureListener { e ->
-                        showProgress(false)
-                        Toast.makeText(this, "Failed to create profile: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
+                showProgress(false)
+                updateStatus("Account created successfully!")
+                
+                // Navigate to appropriate home screen
+                val intent = when (role.lowercase()) {
+                    "calingapro" -> Intent(this, CaregiverHomeActivity::class.java)
+                    else -> Intent(this, CareseekerHomeActivity::class.java)
+                }
+                
+                Toast.makeText(this, "Welcome to Calinga!", Toast.LENGTH_SHORT).show()
+                startActivity(intent)
+                finishAffinity() // Clear the entire task stack
             }
             .addOnFailureListener { e ->
                 showProgress(false)
-                Toast.makeText(this, "Failed to create user: ${e.message}", Toast.LENGTH_LONG).show()
+                updateStatus("Failed to save user data")
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-    }
-    
-    private fun navigateToHome() {
-        val intent = when (role) {
-            "careseeker" -> Intent(this, CareseekerHomeActivity::class.java)
-            "calingapro" -> Intent(this, CaregiverHomeActivity::class.java)
-            else -> Intent(this, LoginActivity::class.java)
-        }
-        
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
     }
     
     private fun showOtpSection() {
-        phoneNumberEditText.isEnabled = false
-        sendOtpButton.visibility = View.GONE
-        otpEditText.visibility = View.VISIBLE
+        tilOtp.visibility = View.VISIBLE
         verifyOtpButton.visibility = View.VISIBLE
-        resendOtpButton.visibility = View.VISIBLE
-        timerTextView.visibility = View.VISIBLE
-    }
-    
-    private fun startTimer() {
-        resendOtpButton.isEnabled = false
-        countDownTimer?.cancel()
-        
-        countDownTimer = object : CountDownTimer(60000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timerTextView.text = "Resend OTP in ${millisUntilFinished / 1000}s"
-            }
-            
-            override fun onFinish() {
-                timerTextView.text = "You can resend OTP now"
-                resendOtpButton.isEnabled = true
-            }
-        }.start()
+        sendOtpButton.visibility = View.GONE
     }
     
     private fun showProgress(show: Boolean) {
         progressBar.visibility = if (show) View.VISIBLE else View.GONE
         sendOtpButton.isEnabled = !show
         verifyOtpButton.isEnabled = !show
+        resendOtpButton.isEnabled = !show
+    }
+    
+    private fun updateStatus(message: String) {
+        statusTextView.text = message
+    }
+    
+    private fun startCountdown() {
+        countDownTimer?.cancel()
+        timerTextView.visibility = View.VISIBLE
+        resendOtpButton.visibility = View.GONE
+        
+        countDownTimer = object : CountDownTimer(60000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val seconds = millisUntilFinished / 1000
+                timerTextView.text = "Resend OTP in ${seconds}s"
+            }
+            
+            override fun onFinish() {
+                timerTextView.visibility = View.GONE
+                resendOtpButton.visibility = View.VISIBLE
+            }
+        }.start()
     }
     
     override fun onDestroy() {
         super.onDestroy()
         countDownTimer?.cancel()
+    }
+    
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // Go back to register activity
+        finish()
     }
 }
