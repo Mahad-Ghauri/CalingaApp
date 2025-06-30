@@ -8,6 +8,8 @@ import android.provider.MediaStore
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.ProgressBar
 //import android.widget.Switch
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -71,8 +73,14 @@ class ProfileActivity : AppCompatActivity() {
         // Set up toolbar
         val toolbar: Toolbar = findViewById(R.id.profile_toolbar)
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Edit Profile"
+        // Remove home button since we have custom layout
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        
+        // Set up menu button click listener
+        findViewById<ImageView>(R.id.imageViewMenu).setOnClickListener {
+            showProfileMenu()
+        }
         
         // Initialize UI components
         profileImage = findViewById(R.id.profile_image)
@@ -335,6 +343,92 @@ class ProfileActivity : AppCompatActivity() {
                 activeStatusSwitch?.visibility = View.GONE
                 rateLayout?.visibility = View.GONE
             }
+    }
+    
+    private fun showProfileMenu() {
+        val menuButton = findViewById<ImageView>(R.id.imageViewMenu)
+        val popup = PopupMenu(this, menuButton)
+        
+        // Add common menu items
+        popup.menu.add(0, 1, 0, "Home")
+        popup.menu.add(0, 2, 0, "My Bookings")
+        popup.menu.add(0, 3, 0, "Map View")
+        popup.menu.add(0, 4, 0, "Settings")
+        popup.menu.add(0, 5, 0, "Logout")
+        
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> {
+                    // Navigate to Home - Check user role to determine which home
+                    val currentUser = auth.currentUser
+                    if (currentUser != null) {
+                        db.collection("users").document(currentUser.uid)
+                            .get()
+                            .addOnSuccessListener { userDoc ->
+                                val userRole = userDoc.getString("role") ?: ""
+                                val intent = if (userRole == "calingapro") {
+                                    Intent(this, CaregiverHomeActivity::class.java)
+                                } else {
+                                    Intent(this, CareseekerHomeActivity::class.java)
+                                }
+                                startActivity(intent)
+                                finish()
+                            }
+                    }
+                    true
+                }
+                2 -> {
+                    // Navigate to Bookings - role-specific
+                    val currentUser = auth.currentUser
+                    if (currentUser != null) {
+                        db.collection("users").document(currentUser.uid)
+                            .get()
+                            .addOnSuccessListener { userDoc ->
+                                val userRole = userDoc.getString("role") ?: ""
+                                val intent = if (userRole == "calingapro") {
+                                    Intent(this, AllBookingsActivity::class.java)
+                                } else {
+                                    Intent(this, CareseekerBookingsActivity::class.java)
+                                }
+                                startActivity(intent)
+                            }
+                    }
+                    true
+                }
+                3 -> {
+                    // Navigate to Map
+                    val currentUser = auth.currentUser
+                    if (currentUser != null) {
+                        db.collection("users").document(currentUser.uid)
+                            .get()
+                            .addOnSuccessListener { userDoc ->
+                                val userRole = userDoc.getString("role") ?: ""
+                                val intent = Intent(this, MapActivity::class.java)
+                                intent.putExtra("USER_ROLE", if (userRole == "calingapro") "caregiver" else "careseeker")
+                                startActivity(intent)
+                            }
+                    }
+                    true
+                }
+                4 -> {
+                    // Settings (stay in profile for now)
+                    Toast.makeText(this, "You are already in Profile Settings", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                5 -> {
+                    // Logout
+                    FirebaseAuth.getInstance().signOut()
+                    val intent = Intent(this, LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                    true
+                }
+                else -> false
+            }
+        }
+        
+        popup.show()
     }
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

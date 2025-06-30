@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Root container - DrawerLayout for navigation drawer functionality -->
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,11 +9,13 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
+    <!-- Main content area with constraint layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#F8F9FA">
 
+        <!-- Top toolbar with app branding and menu - Fixed at top -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -23,19 +26,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <!-- Horizontal layout for toolbar content -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
+                <!-- App logo in circular card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="0dp"
                     app:cardBackgroundColor="@android:color/transparent">
-                    
+
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -45,6 +50,7 @@
                         android:background="@drawable/logo_circle_background" />
                 </androidx.cardview.widget.CardView>
 
+                <!-- App title text -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -55,6 +61,7 @@
                     android:textColor="@color/bright_orange"
                     android:textSize="20sp" />
 
+                <!-- Menu button -->
                 <ImageView
                     android:id="@+id/imageViewMenu"
                     android:layout_width="24dp"
@@ -65,316 +72,349 @@
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 
-        <!-- Welcome Card -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardViewWelcome"
+        <!-- Scrollable content container - Contains all content below toolbar -->
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar">
+            app:layout_constraintEnd_toEndOf="parent">
 
+            <!-- Linear layout to hold all scrollable content vertically -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/welcome_card_background"
-                android:padding="20dp">
+                android:orientation="vertical">
 
-                <LinearLayout
+                <!-- MOVED TO TOP: Patient Info Card - Shows current user's profile info -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardViewPatient"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
 
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_welcome"
-                        app:tint="@color/bright_orange"
-                        android:contentDescription="Welcome icon" />
-
+                    <!-- Patient info horizontal layout with profile image and details -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="16dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:background="@drawable/patient_card_background"
+                        android:padding="12dp">
 
+                        <!-- Circular profile image with border -->
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/imageViewPatient"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:src="@drawable/careseeker"
+                            app:civ_border_color="@color/bright_orange"
+                            app:civ_border_width="2dp" />
+
+                        <!-- Patient details in vertical layout -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <!-- Patient name -->
+                            <TextView
+                                android:id="@+id/textViewPatientName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/sfpro_bold"
+                                android:text="Loading..."
+                                android:textColor="@color/white"
+                                android:textSize="16sp" />
+
+                            <!-- Patient age -->
+                            <TextView
+                                android:id="@+id/textViewPatientAge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/sfpro_med"
+                                android:text="Loading..."
+                                android:textColor="@color/white"
+                                android:alpha="0.9"
+                                android:textSize="14sp" />
+
+                            <!-- Patient address with location icon -->
+                            <TextView
+                                android:id="@+id/textViewPatientAddress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawableStart="@drawable/ic_location"
+                                android:drawablePadding="4dp"
+                                android:drawableTint="@color/bright_orange"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/sfpro_med"
+                                android:maxLines="1"
+                                android:text="Loading..."
+                                android:textColor="@color/white"
+                                android:alpha="0.8"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- MOVED TO SECOND: Welcome Card - App introduction and features -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardViewWelcome"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <!-- Welcome content in vertical layout with gradient background -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/welcome_card_background"
+                        android:padding="20dp">
+
+                        <!-- Welcome header with icon and text -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <!-- Welcome icon -->
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_welcome"
+                                app:tint="@color/bright_orange"
+                                android:contentDescription="Welcome icon" />
+
+                            <!-- Welcome text section -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="16dp"
+                                android:orientation="vertical">
+
+                                <!-- Main welcome title -->
+                                <TextView
+                                    android:id="@+id/textViewWelcomeTitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/sfpro_bold"
+                                    android:text="Welcome to CALiNGA!"
+                                    android:textColor="@color/white"
+                                    android:textSize="20sp" />
+
+                                <!-- Welcome subtitle -->
+                                <TextView
+                                    android:id="@+id/textViewWelcomeMessage"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/sfpro_med"
+                                    android:text="Find the perfect caregiver for your needs"
+                                    android:textColor="@color/white"
+                                    android:alpha="0.9"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                            <!-- Heart decoration icon -->
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_heart_filled"
+                                app:tint="@color/bright_orange"
+                                android:alpha="0.8"
+                                android:contentDescription="Heart icon" />
+                        </LinearLayout>
+
+                        <!-- Feature list with checkmark icons -->
                         <TextView
-                            android:id="@+id/textViewWelcomeTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/sfpro_bold"
-                            android:text="Welcome to CALiNGA!"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="@font/sfpro_med"
+                            android:text="• Browse verified professionals"
                             android:textColor="@color/white"
-                            android:textSize="20sp" />
+                            android:alpha="0.8"
+                            android:textSize="13sp"
+                            android:drawableStart="@drawable/ic_check_circle"
+                            android:drawablePadding="8dp"
+                            android:drawableTint="@color/bright_orange" />
 
                         <TextView
-                            android:id="@+id/textViewWelcomeMessage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:fontFamily="@font/sfpro_med"
-                            android:text="Find the perfect caregiver for your needs"
+                            android:text="• Book appointments instantly"
                             android:textColor="@color/white"
-                            android:alpha="0.9"
-                            android:textSize="14sp" />
-                    </LinearLayout>
+                            android:alpha="0.8"
+                            android:textSize="13sp"
+                            android:drawableStart="@drawable/ic_check_circle"
+                            android:drawablePadding="8dp"
+                            android:drawableTint="@color/bright_orange" />
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_heart_filled"
-                        app:tint="@color/bright_orange"
-                        android:alpha="0.8"
-                        android:contentDescription="Heart icon" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="@font/sfpro_med"
-                    android:text="• Browse verified professionals"
-                    android:textColor="@color/white"
-                    android:alpha="0.8"
-                    android:textSize="13sp"
-                    android:drawableStart="@drawable/ic_check_circle"
-                    android:drawablePadding="8dp"
-                    android:drawableTint="@color/bright_orange" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/sfpro_med"
-                    android:text="• Book appointments instantly"
-                    android:textColor="@color/white"
-                    android:alpha="0.8"
-                    android:textSize="13sp"
-                    android:drawableStart="@drawable/ic_check_circle"
-                    android:drawablePadding="8dp"
-                    android:drawableTint="@color/bright_orange" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/sfpro_med"
-                    android:text="• Get quality care at home"
-                    android:textColor="@color/white"
-                    android:alpha="0.8"
-                    android:textSize="13sp"
-                    android:drawableStart="@drawable/ic_check_circle"
-                    android:drawablePadding="8dp"
-                    android:drawableTint="@color/bright_orange" />
-
-                <!-- Mini Map -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/miniMapCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:layout_marginTop="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?android:attr/selectableItemBackground">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="#E3F2FD">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/map"
-                            android:scaleType="centerCrop"
-                            android:alpha="0.7" />
-
-                        <LinearLayout
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:orientation="vertical"
-                            android:gravity="center">
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/sfpro_med"
+                            android:text="• Get quality care at home"
+                            android:textColor="@color/white"
+                            android:alpha="0.8"
+                            android:textSize="13sp"
+                            android:drawableStart="@drawable/ic_check_circle"
+                            android:drawablePadding="8dp"
+                            android:drawableTint="@color/bright_orange" />
 
-                            <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_location_on"
-                                app:tint="@color/primary_color" />
+                        <!-- Interactive mini map preview -->
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/miniMapCard"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:layout_marginTop="16dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="View Map"
-                                android:textColor="@color/primary_color"
-                                android:textSize="14sp"
-                                android:fontFamily="@font/sfpro_bold"
-                                android:layout_marginTop="4dp" />
-                        </LinearLayout>
-                    </RelativeLayout>
+                            <!-- Map container with overlay -->
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#E3F2FD">
+
+                                <!-- Background map image -->
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/map"
+                                    android:scaleType="centerCrop"
+                                    android:alpha="0.7" />
+
+                                <!-- Centered map interaction prompt -->
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerInParent="true"
+                                    android:orientation="vertical"
+                                    android:gravity="center">
+
+                                    <!-- Location pin icon -->
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/ic_location_on"
+                                        app:tint="@color/primary_color" />
+
+                                    <!-- Map action text -->
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="View Map"
+                                        android:textColor="@color/primary_color"
+                                        android:textSize="14sp"
+                                        android:fontFamily="@font/sfpro_bold"
+                                        android:layout_marginTop="4dp" />
+                                </LinearLayout>
+                            </RelativeLayout>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
                 </androidx.cardview.widget.CardView>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
-        <!-- Patient Info Card -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardViewPatient"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardViewWelcome">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/patient_card_background"
-                android:padding="12dp">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/imageViewPatient"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/careseeker"
-                    app:civ_border_color="@color/bright_orange"
-                    app:civ_border_width="2dp" />
-
-                <LinearLayout
+                <!-- THIRD: Search Bar - Professional search functionality -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardViewSearch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
 
-                    <TextView
-                        android:id="@+id/textViewPatientName"
-                        android:layout_width="wrap_content"
+                    <!-- Search input container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/sfpro_bold"
-                        android:text="Loading..."
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
+                        android:orientation="horizontal"
+                        android:padding="8dp">
 
-                    <TextView
-                        android:id="@+id/textViewPatientAge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/sfpro_med"
-                        android:text="Loading..."
-                        android:textColor="@color/white"
-                        android:alpha="0.9"
-                        android:textSize="14sp" />
+                        <!-- Search icon -->
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_search"
+                            app:tint="@color/bright_orange" />
 
-                    <TextView
-                        android:id="@+id/textViewPatientAddress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawableStart="@drawable/ic_location"
-                        android:drawablePadding="4dp"
-                        android:drawableTint="@color/bright_orange"
-                        android:ellipsize="end"
-                        android:fontFamily="@font/sfpro_med"
-                        android:maxLines="1"
-                        android:text="Loading..."
-                        android:textColor="@color/white"
-                        android:alpha="0.8"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                        <!-- Search input field -->
+                        <EditText
+                            android:id="@+id/editTextSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@null"
+                            android:fontFamily="@font/sfpro_med"
+                            android:hint="Search for a professional..."
+                            android:imeOptions="actionSearch"
+                            android:inputType="text"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:textSize="16sp"
+                            android:textColorHint="@color/text_gray"
+                            android:textColor="@color/dark_blue" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-        <!-- Search Bar with Orange Accent -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardViewSearch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardViewPatient">
+                <!-- Section header for professionals list -->
+                <TextView
+                    android:id="@+id/textViewCaregivers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/sfpro_bold"
+                    android:text="Available Professionals"
+                    android:textColor="@color/dark_blue"
+                    android:textSize="18sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:src="@drawable/ic_search"
-                    app:tint="@color/bright_orange" />
-
-                <EditText
-                    android:id="@+id/editTextSearch"
+                <!-- Professionals list container with swipe refresh -->
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipeRefreshLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@null"
-                    android:fontFamily="@font/sfpro_med"
-                    android:hint="Search for a professional..."
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:textSize="16sp"
-                    android:textColorHint="@color/text_gray"
-                    android:textColor="@color/dark_blue" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <!-- Scrollable list of available professionals -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewCaregivers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="8dp"
+                        android:paddingBottom="88dp"
+                        android:nestedScrollingEnabled="false"
+                        tools:listitem="@layout/item_calingapro_modern" />
+
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </androidx.core.widget.NestedScrollView>
 
-        <TextView
-            android:id="@+id/textViewCaregivers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:fontFamily="@font/sfpro_bold"
-            android:text="Available Professionals"
-            android:textColor="@color/dark_blue"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardViewSearch" />
-
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textViewCaregivers">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewCaregivers"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingHorizontal="8dp"
-                android:paddingBottom="88dp"
-                tools:listitem="@layout/item_calingapro_modern" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
+        <!-- Floating action button for filtering professionals -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
@@ -388,6 +428,8 @@
             app:tint="@color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Navigation drawer menu -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
@@ -404,6 +446,7 @@
         app:itemVerticalPadding="8dp"
         app:itemIconPadding="24dp"
         app:itemTextAppearance="@style/NavMenuTextStyle"
-        app:subheaderTextAppearance="@style/NavSubheaderTextStyle" />
+        app:subheaderTextAppearance="@style/NavSubheaderTextStyle"
+        android:visibility="visible"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
