@@ -140,7 +140,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
 
         // Set up swipe refresh
         swipeRefreshLayout.setOnRefreshListener {
-            getCurrentLocationAndLoadCalingaPros()
+            refreshAllData()
         }
         
         // Set up swipe refresh colors
@@ -152,7 +152,8 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
 
         // Set up click listeners
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            // Handle filter click
+            // Handle refresh/filter click
+            refreshAllData()
         }
         
         // Load user profile data and get location
@@ -476,6 +477,25 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         } else {
             super.onBackPressed()
         }
+    }
+    
+    /**
+     * Refresh all data including user profile and nearby CalingaPros
+     */
+    private fun refreshAllData() {
+        if (!swipeRefreshLayout.isRefreshing) {
+            swipeRefreshLayout.isRefreshing = true
+        }
+        loadUserProfile()
+        getCurrentLocationAndLoadCalingaPros()
+    }
+    
+    /**
+     * Stop the refresh indicator and show completion message
+     */
+    private fun stopRefreshWithMessage(message: String) {
+        swipeRefreshLayout.isRefreshing = false
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
 

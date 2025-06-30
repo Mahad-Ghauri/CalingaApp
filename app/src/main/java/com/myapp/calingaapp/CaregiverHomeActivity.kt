@@ -21,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -75,7 +76,7 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
 
         // Set up swipe refresh
         swipeRefreshLayout.setOnRefreshListener {
-            loadTodaysBookings()
+            refreshBookings()
         }
         
         // Set up swipe refresh colors
@@ -86,7 +87,7 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         )
 
         // Load today's bookings
-        loadTodaysBookings()
+        refreshBookings()
 
         // Update CalingaPro location and set active status
         updateLocation()
@@ -94,7 +95,7 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         // Set up click listeners
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             // Handle refresh click
-            loadTodaysBookings()
+            refreshBookings()
         }
     }
 
@@ -170,57 +171,59 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
             return
         }
         
-        // Get current user's profile to get the caregiver name
-        db.collection("userProfiles").document(currentUser.uid)
+        // Calculate start and end of today in UTC
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val startOfDay = com.google.firebase.Timestamp(calendar.time)
+        
+        calendar.add(Calendar.DAY_OF_MONTH, 1)
+        val startOfNextDay = com.google.firebase.Timestamp(calendar.time)
+        
+        // Query bookings for today based on createdAt timestamp
+        db.collection("bookings")
+            .whereEqualTo("calingaproId", currentUser.uid)
+            .whereGreaterThanOrEqualTo("createdAt", startOfDay)
+            .whereLessThan("createdAt", startOfNextDay)
             .get()
-            .addOnSuccessListener { profileDoc ->
-                if (profileDoc.exists()) {
-                    val userProfile = profileDoc.toObject(UserProfile::class.java)
-                    val caregiverName = userProfile?.name ?: ""
-                    
-                    // Get today's date in the format used when booking
-                    val today = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(Date())
-                    
-                    // Query bookings for today for this caregiver
-                    db.collection("bookings")
-                        .whereEqualTo("calingaproId", currentUser.uid) // Updated to use calingaproId
-                        .whereEqualTo("date", today) // Updated to use date field
-                        .get()
-                        .addOnSuccessListener { documents ->
-                            bookingList.clear()
-                            
-                            for (document in documents) {
-                                // Use the document.toObject method with the new Booking schema
-                                val booking = document.toObject(Booking::class.java)
-                                if (booking != null) {
-                                    bookingList.add(booking)
-                                }
-                            }
-                            
-                            // Sort by time
-                            bookingList.sortBy { "${it.timeFrom} ${it.timeTo}" } // Updated to use new fields
-                            bookingAdapter.notifyDataSetChanged()
-                            swipeRefreshLayout.isRefreshing = false
-                            
-                            if (bookingList.isEmpty()) {
-                                Toast.makeText(this, "No bookings for today", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        .addOnFailureListener { exception ->
-                            swipeRefreshLayout.isRefreshing = false
-                            Toast.makeText(this, "Error loading bookings: ${exception.message}", Toast.LENGTH_SHORT).show()
-                        }
-                } else {
-                    swipeRefreshLayout.isRefreshing = false
-                    Toast.makeText(this, "Profile not found", Toast.LENGTH_SHORT).show()
+            .addOnSuccessListener { documents ->
+                bookingList.clear()
+                
+                for (document in documents) {
+                    val booking = document.toObject(Booking::class.java)
+                    if (booking != null) {
+                        bookingList.add(booking)
+                    }
+                }
+                
+                // Sort by creation time (most recent first)
+                bookingList.sortByDescending { it.createdAt }
+                bookingAdapter.notifyDataSetChanged()
+                swipeRefreshLayout.isRefreshing = false
+                
+                if (bookingList.isEmpty()) {
+                    Toast.makeText(this, "No bookings for today", Toast.LENGTH_SHORT).show()
                 }
             }
             .addOnFailureListener { exception ->
                 swipeRefreshLayout.isRefreshing = false
-                Toast.makeText(this, "Error loading profile: ${exception.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error loading bookings: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
-      override fun onNavigationItemSelected(item: MenuItem): Boolean {
+    
+    /**
+     * Refresh today's bookings data
+     */
+    private fun refreshBookings() {
+        if (!swipeRefreshLayout.isRefreshing) {
+            swipeRefreshLayout.isRefreshing = true
+        }
+        loadTodaysBookings()
+    }
+    
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_home -> {
                 // We're already in the home screen, just close drawer
