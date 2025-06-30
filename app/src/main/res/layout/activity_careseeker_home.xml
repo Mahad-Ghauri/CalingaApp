@@ -222,7 +222,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
                                     android:fontFamily="@font/sfpro_med"
-                                    android:text="Find the perfect caregiver for your needs"
+                                    android:text="Find the Perfect CALiNGAPro for your needs"
                                     android:textColor="@color/white"
                                     android:alpha="0.9"
                                     android:textSize="14sp" />

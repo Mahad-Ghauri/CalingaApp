@@ -357,6 +357,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
                             address = userProfile.address,
                             rate = if (userProfile.ratePerHour > 0) userProfile.ratePerHour.toInt() else 25, // Use actual rate or default
                             photoResId = R.drawable.ic_person_placeholder,
+                            profilePhotoUrl = userProfile.profilePhotoUrl, // Add profile photo URL
                             experience = "1yr", // You can add this field to UserProfile later
                             patients = 0, // You can add this field to UserProfile later
                             bloodType = "O+", // You can add this field to UserProfile later
@@ -485,7 +486,8 @@ data class CalingaPro(
     val tier: String,
     val address: String,
     val rate: Int,
-    val photoResId: Int = R.drawable.ic_person_placeholder, // Default placeholder
+    val photoResId: Int = R.drawable.ic_person_placeholder, // Default placeholder for fallback
+    val profilePhotoUrl: String = "", // Profile photo URL from Firebase Storage
     val experience: String = "1yr",
     val patients: Int = 0,
     val bloodType: String = "O+",

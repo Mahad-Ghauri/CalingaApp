@@ -20,6 +20,7 @@ class CalingaProActivity : AppCompatActivity() {
         val address = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_ADDRESS) ?: ""
         val rate = intent.getIntExtra(CalingaProAdapter.EXTRA_CAREGIVER_RATE, 0)
         val photoResId = intent.getIntExtra(CalingaProAdapter.EXTRA_CAREGIVER_PHOTO_RES_ID, R.drawable.ic_person_placeholder)
+        val photoUrl = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_PHOTO_URL) ?: ""
         val experience = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_EXPERIENCE) ?: "N/A"
         val patients = intent.getIntExtra(CalingaProAdapter.EXTRA_CAREGIVER_PATIENTS, 0)
         val bloodType = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_BLOOD_TYPE) ?: "N/A"
@@ -29,7 +30,12 @@ class CalingaProActivity : AppCompatActivity() {
         val phone = intent.getStringExtra(CalingaProAdapter.EXTRA_CAREGIVER_PHONE) ?: ""
         
         // Set the views with the caregiver data
-        findViewById<ImageView>(R.id.imageViewPhoto).setImageResource(photoResId)
+        val profileImageView = findViewById<ImageView>(R.id.imageViewPhoto)
+        if (photoUrl.isNotEmpty()) {
+            ImageUtils.loadImage(this, photoUrl, profileImageView, photoResId)
+        } else {
+            profileImageView.setImageResource(photoResId)
+        }
         findViewById<TextView>(R.id.textViewName).text = name
         findViewById<TextView>(R.id.textViewTitle).text = tier
         findViewById<TextView>(R.id.textViewEmail).text = email
@@ -55,7 +61,7 @@ class CalingaProActivity : AppCompatActivity() {
                 putExtra("caregiver_uid", uid) // Add the missing UID
                 putExtra("caregiver_name", name)
                 putExtra("caregiver_tier", tier)
-                putExtra("caregiver_rate", rate)
+                putExtra("caregiver_rate", rate.toDouble())
                 putExtra("caregiver_email", email)
                 putExtra("caregiver_phone", phone)
             }

@@ -198,7 +198,7 @@ class CaregiverHomeActivity : AppCompatActivity(), NavigationView.OnNavigationIt
                             }
                             
                             // Sort by time
-                            bookingList.sortBy { "${it.date} ${it.time}" } // Updated to use new fields
+                            bookingList.sortBy { "${it.timeFrom} ${it.timeTo}" } // Updated to use new fields
                             bookingAdapter.notifyDataSetChanged()
                             swipeRefreshLayout.isRefreshing = false
                             

@@ -31,6 +31,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var storage: FirebaseStorage
     private lateinit var locationManager: LocationManager
+    private lateinit var storageManager: FirebaseStorageManager
     
     private lateinit var profileImage: CircleImageView
     private lateinit var editName: TextInputEditText
@@ -50,12 +51,29 @@ class ProfileActivity : AppCompatActivity() {
     private var profilePhotoUrl: String = ""
     private var userProfile = UserProfile()
     
-    private val getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    // Activity result launchers for camera and gallery
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            photoUri?.let { uri ->
+                val compressedUri = ImageUtils.compressImage(this, uri)
+                if (compressedUri != null) {
+                    photoUri = compressedUri
+                    ImageUtils.loadCircularImage(this, compressedUri.toString(), profileImage)
+                }
+            }
+        }
+    }
+    
+    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             if (data != null && data.data != null) {
-                photoUri = data.data
-                profileImage.setImageURI(photoUri)
+                val selectedUri = data.data!!
+                val compressedUri = ImageUtils.compressImage(this, selectedUri)
+                if (compressedUri != null) {
+                    photoUri = compressedUri
+                    ImageUtils.loadCircularImage(this, compressedUri.toString(), profileImage)
+                }
             }
         }
     }
@@ -69,6 +87,7 @@ class ProfileActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
         locationManager = LocationManager(this)
+        storageManager = FirebaseStorageManager()
         
         // Set up toolbar
         val toolbar: Toolbar = findViewById(R.id.profile_toolbar)
@@ -106,10 +125,9 @@ class ProfileActivity : AppCompatActivity() {
         // Load user profile data
         loadUserProfile()
         
-        // Set up image click listener
+        // Set up image click listener with camera/gallery options
         profileImage.setOnClickListener {
-            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            getContent.launch(galleryIntent)
+            showImagePickerDialog()
         }
         
         // Set up save button click listener
@@ -173,8 +191,7 @@ class ProfileActivity : AppCompatActivity() {
                                 // Load profile image if available
                                 profilePhotoUrl = userProfile.profilePhotoUrl
                                 if (profilePhotoUrl.isNotEmpty()) {
-                                    // Load image using Glide or similar library
-                                    // For simplicity, we're not implementing this here
+                                    ImageUtils.loadCircularImage(this@ProfileActivity, profilePhotoUrl, profileImage)
                                 }
                                 
                                 showProgress(false)
@@ -221,18 +238,20 @@ class ProfileActivity : AppCompatActivity() {
         
         // If a new photo was selected, upload it first
         if (photoUri != null) {
-            val storageRef = storage.reference.child("profile_images/${currentUser.uid}/${UUID.randomUUID()}")
-            storageRef.putFile(photoUri!!)
-                .addOnSuccessListener {
-                    storageRef.downloadUrl.addOnSuccessListener { uri ->
-                        profilePhotoUrl = uri.toString()
-                        saveProfileData(currentUser.uid, name, age, address, bio, phone, emergencyContact, medicalConditions)
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Failed to upload image: ${e.message}", Toast.LENGTH_SHORT).show()
+            storageManager.uploadProfilePhoto(
+                imageUri = photoUri!!,
+                onSuccess = { downloadUrl ->
+                    profilePhotoUrl = downloadUrl
+                    saveProfileData(currentUser.uid, name, age, address, bio, phone, emergencyContact, medicalConditions)
+                },
+                onFailure = { exception ->
+                    Toast.makeText(this, "Failed to upload image: ${exception.message}", Toast.LENGTH_SHORT).show()
                     showProgress(false)
+                },
+                onProgress = { progress ->
+                    // You can add a progress bar update here if needed
                 }
+            )
         } else {
             saveProfileData(currentUser.uid, name, age, address, bio, phone, emergencyContact, medicalConditions)
         }
@@ -429,6 +448,21 @@ class ProfileActivity : AppCompatActivity() {
         }
         
         popup.show()
+    }
+    
+    private fun showImagePickerDialog() {
+        ImageUtils.showImagePickerDialog(
+            context = this,
+            onCameraSelected = {
+                val (cameraIntent, uri) = ImageUtils.createCameraIntent(this)
+                photoUri = uri
+                cameraLauncher.launch(cameraIntent)
+            },
+            onGallerySelected = {
+                val galleryIntent = ImageUtils.createGalleryIntent()
+                galleryLauncher.launch(galleryIntent)
+            }
+        )
     }
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

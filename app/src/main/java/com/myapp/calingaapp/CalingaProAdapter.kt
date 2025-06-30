@@ -23,8 +23,17 @@ class CalingaProAdapter(private val calingaProList: List<CalingaPro>) :
         holder.nameTextView.text = currentItem.name
         holder.tierTextView.text = currentItem.tier
         
-        // Set the caregiver photo
-        holder.photoImageView.setImageResource(currentItem.photoResId)
+        // Load the caregiver photo from URL or use placeholder
+        if (currentItem.profilePhotoUrl.isNotEmpty()) {
+            ImageUtils.loadCircularImage(
+                context = holder.itemView.context,
+                imageUrl = currentItem.profilePhotoUrl,
+                imageView = holder.photoImageView,
+                placeholder = currentItem.photoResId
+            )
+        } else {
+            holder.photoImageView.setImageResource(currentItem.photoResId)
+        }
         
         // Extract city and state from address
         val addressParts = currentItem.address.split(",")
@@ -56,6 +65,7 @@ class CalingaProAdapter(private val calingaProList: List<CalingaPro>) :
                 putExtra(EXTRA_CAREGIVER_ADDRESS, currentItem.address)
                 putExtra(EXTRA_CAREGIVER_RATE, currentItem.rate)
                 putExtra(EXTRA_CAREGIVER_PHOTO_RES_ID, currentItem.photoResId)
+                putExtra(EXTRA_CAREGIVER_PHOTO_URL, currentItem.profilePhotoUrl)
                 putExtra(EXTRA_CAREGIVER_EXPERIENCE, currentItem.experience)
                 putExtra(EXTRA_CAREGIVER_PATIENTS, currentItem.patients)
                 putExtra(EXTRA_CAREGIVER_BLOOD_TYPE, currentItem.bloodType)
@@ -86,6 +96,7 @@ class CalingaProAdapter(private val calingaProList: List<CalingaPro>) :
         const val EXTRA_CAREGIVER_ADDRESS = "extra_caregiver_address"
         const val EXTRA_CAREGIVER_RATE = "extra_caregiver_rate"
         const val EXTRA_CAREGIVER_PHOTO_RES_ID = "extra_caregiver_photo_res_id"
+        const val EXTRA_CAREGIVER_PHOTO_URL = "extra_caregiver_photo_url"
         const val EXTRA_CAREGIVER_EXPERIENCE = "extra_caregiver_experience"
         const val EXTRA_CAREGIVER_PATIENTS = "extra_caregiver_patients"
         const val EXTRA_CAREGIVER_BLOOD_TYPE = "extra_caregiver_blood_type"

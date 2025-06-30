@@ -30,11 +30,11 @@ class BookingAdapter(private val bookingList: MutableList<Booking>, private val 
         val currentItem = bookingList[position]
         
         // Set booking details
-        holder.dateTimeTextView.text = "${currentItem.date} at ${currentItem.time}"
+        holder.dateTimeTextView.text = "${currentItem.timeFrom} - ${currentItem.timeTo}"
         holder.addressTextView.text = currentItem.address
         holder.statusTextView.text = currentItem.status.uppercase()
         holder.notesTextView.text = if (currentItem.notes.isNotEmpty()) currentItem.notes else "No special notes"
-        holder.rateTextView.text = "$${currentItem.ratePerHour}/hr"
+        holder.rateTextView.text = "$${currentItem.ratePerHour.toInt()}/hr"
         holder.tierTextView.text = currentItem.caregiverTier
         
         // Set status color and button visibility based on booking status

@@ -30,18 +30,21 @@ data class Booking(
     val careseekerId: String = "",
     val calingaproId: String = "",
     val caregiverTier: String = "",
-    val date: String = "",
-    val time: String = "",
+    val caregiverName: String = "",
+    val timeFrom: String = "", // Start time for the service
+    val timeTo: String = "",   // End time for the service  
+    val totalHours: Double = 0.0, // Duration in hours
     val address: String = "",
     val notes: String = "",
     val ratePerHour: Double = 0.0,
     val totalAmount: Double = 0.0,
+    val paymentMethod: String = "",
     val status: String = "pending", // "pending" | "accepted" | "completed" | "cancelled"
     val completionNotes: String = "", // Notes added when service is completed
     val createdAt: Timestamp = Timestamp.now(),
     val completedAt: Timestamp? = null // Timestamp when service was completed
 ) {
-    constructor() : this("", "", "", "", "", "", "", "", 0.0, 0.0, "pending", "", Timestamp.now(), null)
+    constructor() : this("", "", "", "", "", "", "", 0.0, "", "", 0.0, 0.0, "", "pending", "", Timestamp.now(), null)
     
     fun toMap(): Map<String, Any> {
         val map = mutableMapOf<String, Any>(
@@ -49,12 +52,15 @@ data class Booking(
             "careseekerId" to careseekerId,
             "calingaproId" to calingaproId,
             "caregiverTier" to caregiverTier,
-            "date" to date,
-            "time" to time,
+            "caregiverName" to caregiverName,
+            "timeFrom" to timeFrom,
+            "timeTo" to timeTo,
+            "totalHours" to totalHours,
             "address" to address,
             "notes" to notes,
             "ratePerHour" to ratePerHour,
             "totalAmount" to totalAmount,
+            "paymentMethod" to paymentMethod,
             "status" to status,
             "completionNotes" to completionNotes,
             "createdAt" to createdAt

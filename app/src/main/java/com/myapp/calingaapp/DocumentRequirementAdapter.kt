@@ -10,8 +10,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
+interface DocumentUploadListener {
+    fun onDocumentUploadClicked(documentType: String, position: Int)
+    fun onDocumentViewClicked(documentUrl: String)
+}
+
 class DocumentRequirementAdapter(
-    private var documentList: List<DocumentRequirement>
+    private var documentList: List<DocumentRequirement>,
+    private val uploadListener: DocumentUploadListener
 ) : RecyclerView.Adapter<DocumentRequirementAdapter.DocumentViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DocumentViewHolder {
@@ -45,22 +51,9 @@ class DocumentRequirementAdapter(
         // Set click listener for upload button
         holder.uploadButton.setOnClickListener {
             if (!document.isUploaded) {
-                // Create intent to pick document
-                val intent = Intent(Intent.ACTION_GET_CONTENT)
-                intent.type = "*/*" // All file types
-                holder.itemView.context.startActivity(
-                    Intent.createChooser(intent, "Select a document")
-                )
-                
-                // In a real app, you'd handle the result in the activity
-                // For now, just simulate a successful upload
-                document.isUploaded = true
-                notifyItemChanged(position)
+                uploadListener.onDocumentUploadClicked(document.title, position)
             } else {
-                // If already uploaded, we would show the document
-                // But for now, just show that it's already uploaded
-                document.isUploaded = false
-                notifyItemChanged(position)
+                uploadListener.onDocumentViewClicked(document.documentUrl ?: "")
             }
         }
     }
@@ -70,6 +63,15 @@ class DocumentRequirementAdapter(
     fun updateDocuments(newDocuments: List<DocumentRequirement>) {
         documentList = newDocuments
         notifyDataSetChanged()
+    }
+    
+    fun markDocumentAsUploaded(position: Int, documentUrl: String) {
+        if (position in documentList.indices) {
+            val mutableList = documentList.toMutableList()
+            mutableList[position] = mutableList[position].copy(isUploaded = true, documentUrl = documentUrl)
+            documentList = mutableList
+            notifyItemChanged(position)
+        }
     }
 
     class DocumentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
