@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".BookingDetailsActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F8F9FA">
+
+        <!-- Top App Bar - Same design as CaregiverHome -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/toolbar_background"
+            android:elevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Back button -->
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/bright_orange"
+                    android:contentDescription="Back"
+                    android:layout_marginEnd="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@android:color/transparent">
+                    
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/logo_calinga"
+                        android:contentDescription="Calinga Logo"
+                        android:background="@drawable/logo_circle_background" />
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/sfpro_bold"
+                    android:text="Booking Details"
+                    android:textColor="@color/bright_orange"
+                    android:textSize="20sp" />
+
+                <ImageView
+                    android:id="@+id/imageViewMenu"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_menu"
+                    app:tint="@color/bright_orange"
+                    android:contentDescription="More options" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <!-- Scrollable content -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Status Badge -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp">
+
+                    <TextView
+                        android:id="@+id/textViewStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="24dp"
+                        android:paddingVertical="8dp"
+                        android:text="PENDING"
+                        android:fontFamily="@font/sfpro_bold"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:background="@drawable/status_pending_background" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- Customer Information Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Customer Information"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:textSize="18sp"
+                            android:textColor="@color/primary_color"
+                            android:layout_marginBottom="16dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_person"
+                                app:tint="@color/bright_orange"
+                                android:layout_marginEnd="12dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <TextView
+                                android:id="@+id/textViewCustomerName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="John Doe"
+                                android:fontFamily="@font/sfpro_med"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_primary" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_location"
+                                app:tint="@color/bright_orange"
+                                android:layout_marginEnd="12dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <TextView
+                                android:id="@+id/textViewAddress"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="123 Main Street, City"
+                                android:fontFamily="@font/sfpro_med"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_primary" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Service Details Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Service Details"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:textSize="18sp"
+                            android:textColor="@color/primary_color"
+                            android:layout_marginBottom="16dp" />
+
+                        <!-- Time -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_schedule"
+                                app:tint="@color/bright_orange"
+                                android:layout_marginEnd="12dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <TextView
+                                android:id="@+id/textViewTimeSlot"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="10:00 AM - 12:00 PM"
+                                android:fontFamily="@font/sfpro_med"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_primary" />
+                        </LinearLayout>
+
+                        <!-- Duration -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_schedule"
+                                app:tint="@color/bright_orange"
+                                android:layout_marginEnd="12dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <TextView
+                                android:id="@+id/textViewDuration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2 hours"
+                                android:fontFamily="@font/sfpro_med"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_primary" />
+                        </LinearLayout>
+
+                        <!-- Rate -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_attach_money"
+                                app:tint="@color/bright_orange"
+                                android:layout_marginEnd="12dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <TextView
+                                android:id="@+id/textViewRate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$25/hour"
+                                android:fontFamily="@font/sfpro_med"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_primary" />
+                        </LinearLayout>
+
+                        <!-- Total Amount -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_payment"
+                                app:tint="@color/bright_orange"
+                                android:layout_marginEnd="12dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/textViewTotalAmount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Total: $50"
+                                    android:fontFamily="@font/sfpro_bold"
+                                    android:textSize="18sp"
+                                    android:textColor="@color/primary_color" />
+
+                                <TextView
+                                    android:id="@+id/textViewPaymentMethod"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Payment: Credit Card"
+                                    android:fontFamily="@font/sfpro_med"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/text_secondary"
+                                    android:layout_marginTop="4dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Notes Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Special Notes"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:textSize="18sp"
+                            android:textColor="@color/primary_color"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView
+                            android:id="@+id/textViewNotes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Please bring medical equipment. Patient has mobility issues."
+                            android:fontFamily="@font/sfpro_med"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_primary"
+                            android:lineSpacingExtra="4dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Booking Timeline Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Booking Timeline"
+                            android:fontFamily="@font/sfpro_bold"
+                            android:textSize="18sp"
+                            android:textColor="@color/primary_color"
+                            android:layout_marginBottom="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_schedule"
+                                app:tint="@color/text_secondary"
+                                android:layout_marginEnd="8dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <TextView
+                                android:id="@+id/textViewCreatedAt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Created: July 1, 2025 at 1:49 AM"
+                                android:fontFamily="@font/sfpro_med"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutCompletedAt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_check_circle"
+                                app:tint="@color/primary_color"
+                                android:layout_marginEnd="8dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <TextView
+                                android:id="@+id/textViewCompletedAt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Completed: July 1, 2025 at 6:30 PM"
+                                android:fontFamily="@font/sfpro_med"
+                                android:textSize="14sp"
+                                android:textColor="@color/primary_color" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Action Buttons -->
+                <LinearLayout
+                    android:id="@+id/layoutActionButtons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="32dp">
+
+                    <Button
+                        android:id="@+id/buttonAccept"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="Accept Booking"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_primary"
+                        android:fontFamily="@font/sfpro_bold"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/buttonComplete"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Complete Service"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_success"
+                        android:fontFamily="@font/sfpro_bold"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Navigation drawer (if needed) -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        android:background="@color/white"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/caregiver_drawer_menu"
+        android:visibility="gone"/>
+
+</androidx.drawerlayout.widget.DrawerLayout>

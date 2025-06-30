@@ -2,6 +2,7 @@ package com.myapp.calingaapp
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -75,6 +76,11 @@ class BookingAdapter(private val bookingList: MutableList<Booking>, private val 
         holder.completeButton.setOnClickListener {
             showCompleteServiceDialog(currentItem, position)
         }
+        
+        // Add click listener to open booking details
+        holder.itemView.setOnClickListener {
+            openBookingDetails(currentItem)
+        }
     }
 
     private fun updateBookingStatus(booking: Booking, newStatus: String, position: Int) {
@@ -147,6 +153,26 @@ class BookingAdapter(private val bookingList: MutableList<Booking>, private val 
         }
         
         dialog.show()
+    }
+
+    private fun openBookingDetails(booking: Booking) {
+        val intent = Intent(context, BookingDetailsActivity::class.java).apply {
+            putExtra("BOOKING_ID", booking.bookingId)
+            putExtra("CARESEEKER_ID", booking.careseekerId)
+            putExtra("CAREGIVER_NAME", booking.caregiverName)
+            putExtra("TIME_FROM", booking.timeFrom)
+            putExtra("TIME_TO", booking.timeTo)
+            putExtra("ADDRESS", booking.address)
+            putExtra("NOTES", booking.notes)
+            putExtra("STATUS", booking.status)
+            putExtra("RATE_PER_HOUR", booking.ratePerHour)
+            putExtra("TOTAL_HOURS", booking.totalHours)
+            putExtra("TOTAL_AMOUNT", booking.totalAmount)
+            putExtra("PAYMENT_METHOD", booking.paymentMethod)
+            putExtra("CREATED_AT", booking.createdAt.toDate().time)
+            booking.completedAt?.let { putExtra("COMPLETED_AT", it.toDate().time) }
+        }
+        context.startActivity(intent)
     }
 
     override fun getItemCount() = bookingList.size
