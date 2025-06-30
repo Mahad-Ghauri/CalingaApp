@@ -53,7 +53,7 @@
                     android:layout_weight="1"
                     android:fontFamily="@font/sfpro_bold"
                     android:text="CALiNGA Care Pro"
-                    android:textColor="@color/white"
+                    android:textColor="@color/bright_orange"
                     android:textSize="20sp" />
 
                 <ImageView
@@ -62,7 +62,7 @@
                     android:layout_height="24dp"
                     android:layout_marginEnd="16dp"
                     android:src="@drawable/ic_menu"
-                    app:tint="@color/white"
+                    app:tint="@color/bright_orange"
                     android:contentDescription="Menu" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>

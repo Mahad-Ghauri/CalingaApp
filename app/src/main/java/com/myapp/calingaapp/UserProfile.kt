@@ -16,10 +16,11 @@ data class UserProfile(
     val isApproved: Boolean = false,
     val isActive: Boolean = false,
     val documents: List<String> = emptyList(),
+    val ratePerHour: Double = 0.0,
     val createdAt: Timestamp = Timestamp.now()
 ) {
     // Empty constructor required for Firestore
-    constructor() : this("", "", null, "", 0.0, 0.0, "", "", emptyList(), "", false, false, emptyList(), Timestamp.now())
+    constructor() : this("", "", null, "", 0.0, 0.0, "", "", emptyList(), "", false, false, emptyList(), 0.0, Timestamp.now())
     
     // Convert to Map for Firestore
     fun toMap(): Map<String, Any?> {
@@ -37,6 +38,7 @@ data class UserProfile(
             "isApproved" to isApproved,
             "isActive" to isActive,
             "documents" to documents,
+            "ratePerHour" to ratePerHour,
             "createdAt" to createdAt
         )
     }

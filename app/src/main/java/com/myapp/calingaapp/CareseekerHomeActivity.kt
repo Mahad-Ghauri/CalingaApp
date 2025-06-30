@@ -355,7 +355,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
                             name = userProfile.name,
                             tier = userProfile.caregiverTier,
                             address = userProfile.address,
-                            rate = 25, // Default rate, you can add this field to UserProfile later
+                            rate = if (userProfile.ratePerHour > 0) userProfile.ratePerHour.toInt() else 25, // Use actual rate or default
                             photoResId = R.drawable.ic_person_placeholder,
                             experience = "1yr", // You can add this field to UserProfile later
                             patients = 0, // You can add this field to UserProfile later

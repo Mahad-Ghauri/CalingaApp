@@ -156,7 +156,44 @@ class LocationManager(private val context: Context) {
                 callback(true, null)
             }
             .addOnFailureListener { exception ->
-                callback(false, exception.message)
+                // If update fails (document doesn't exist), create a new location document
+                createLocationDocumentWithActiveStatus(currentUser.uid, isActive, callback)
+            }
+    }
+    
+    /**
+     * Creates a location document with the specified active status
+     */
+    private fun createLocationDocumentWithActiveStatus(userId: String, isActive: Boolean, callback: (Boolean, String?) -> Unit) {
+        // First get the user's role from the users collection
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { userDoc ->
+                if (userDoc.exists()) {
+                    val userRole = userDoc.getString("role") ?: "careseeker"
+                    
+                    val locationData = LocationData(
+                        uid = userId,
+                        role = userRole,
+                        isActive = isActive,
+                        lastUpdated = System.currentTimeMillis(),
+                        location = LocationCoordinates(0.0, 0.0) // Default location, will be updated when user enables location
+                    )
+                    
+                    db.collection(LOCATIONS_COLLECTION).document(userId)
+                        .set(locationData.toMap())
+                        .addOnSuccessListener {
+                            callback(true, null)
+                        }
+                        .addOnFailureListener { createException ->
+                            callback(false, createException.message)
+                        }
+                } else {
+                    callback(false, "User profile not found in users collection")
+                }
+            }
+            .addOnFailureListener { getUserException ->
+                callback(false, getUserException.message)
             }
     }
     

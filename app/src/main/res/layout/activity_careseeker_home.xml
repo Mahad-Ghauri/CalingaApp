@@ -51,8 +51,8 @@
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:fontFamily="@font/sfpro_bold"
-                    android:text="CALiNGApro"
-                    android:textColor="@color/white"
+                    android:text="CALiNGA On Demand Care "
+                    android:textColor="@color/bright_orange"
                     android:textSize="20sp" />
 
                 <ImageView
@@ -61,7 +61,7 @@
                     android:layout_height="24dp"
                     android:layout_marginEnd="16dp"
                     android:src="@drawable/ic_menu"
-                    app:tint="@color/white" />
+                    app:tint="@color/bright_orange" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 

@@ -20,7 +20,7 @@
             android:background="@drawable/toolbar_background"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="Edit Profile"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@color/bright_orange" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -278,6 +278,30 @@
                             android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Rate per Hour field for CalingaPros -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/rate_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:hint="Rate per Hour ($)"
+                        android:visibility="gone"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:startIconDrawable="@drawable/ic_money"
+                        app:startIconTint="@color/bright_orange"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_rate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
                     <!-- Active Status Switch for CalingaPros -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
@@ -319,7 +343,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Toggle to show availability to careseekers"
+                                    android:text="Toggle to show availability to careseekers (if you are a CALiNGAPro)"
                                     android:textSize="14sp"
                                     android:textColor="@color/text_secondary"
                                     android:layout_marginTop="4dp" />

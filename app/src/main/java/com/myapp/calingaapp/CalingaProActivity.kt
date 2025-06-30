@@ -40,6 +40,14 @@ class CalingaProActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.textViewHeight).text = height
         findViewById<TextView>(R.id.textViewAbout).text = about
         
+        // Set the rate with proper formatting
+        findViewById<TextView>(R.id.textViewRate).text = "$$rate/hour"
+        
+        // Set up back button
+        findViewById<ImageView>(R.id.imageViewBack).setOnClickListener {
+            finish()
+        }
+        
         // Set up the book appointment button to navigate to BookingActivity
         findViewById<Button>(R.id.buttonBookAppointment).setOnClickListener {
             val intent = Intent(this, BookingActivity::class.java).apply {

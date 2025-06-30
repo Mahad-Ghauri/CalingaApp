@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -37,9 +38,11 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var editBio: TextInputEditText
     private lateinit var editEmergencyContact: TextInputEditText
     private lateinit var editMedicalConditions: TextInputEditText
+    private lateinit var editRate: TextInputEditText // For CalingaPros only
     private lateinit var saveButton: Button
     private lateinit var progressBar: ProgressBar
     private var activeStatusSwitch: SwitchMaterial? = null // Optional switch for CalingaPro active status
+    private var rateLayout: TextInputLayout? = null // Layout for rate field
     
     private var photoUri: Uri? = null
     private var profilePhotoUrl: String = ""
@@ -80,12 +83,17 @@ class ProfileActivity : AppCompatActivity() {
         editBio = findViewById(R.id.edit_bio)
         editEmergencyContact = findViewById(R.id.edit_emergency_contact)
         editMedicalConditions = findViewById(R.id.edit_medical_conditions)
+        editRate = findViewById(R.id.edit_rate)
         saveButton = findViewById(R.id.btn_save_profile)
         progressBar = findViewById(R.id.progress_bar)
         
-        // Initialize active status switch for CalingaPros (will be shown/hidden based on user type)
+        // Initialize CalingaPro-specific fields
         activeStatusSwitch = findViewById(R.id.switch_active_status)
-        activeStatusSwitch?.visibility = View.GONE // Hidden by default
+        rateLayout = findViewById(R.id.rate_layout)
+        
+        // Hide CalingaPro-specific fields by default
+        activeStatusSwitch?.visibility = View.GONE
+        rateLayout?.visibility = View.GONE
         
         // Load user profile data
         loadUserProfile()
@@ -145,6 +153,7 @@ class ProfileActivity : AppCompatActivity() {
                                 editAge.setText(if (userProfile.age != null && userProfile.age!! > 0) userProfile.age.toString() else "")
                                 editAddress.setText(userProfile.address)
                                 editBio.setText(userProfile.bio)
+                                editRate.setText(if (userProfile.ratePerHour > 0) userProfile.ratePerHour.toString() else "")
                                 // TODO: Phone, emergency contact, and medical conditions need to be added to new schema if needed
                                 // editPhone.setText("")
                                 // editEmergencyContact.setText("")
@@ -231,6 +240,18 @@ class ProfileActivity : AppCompatActivity() {
         emergencyContact: String, 
         medicalConditions: String
     ) {
+        // Get rate per hour if user is CalingaPro
+        val rateText = editRate.text.toString().trim()
+        val ratePerHour = if (rateText.isNotEmpty()) {
+            try {
+                rateText.toDouble()
+            } catch (e: NumberFormatException) {
+                0.0
+            }
+        } else {
+            0.0
+        }
+        
         // Update the user profile object using the map approach since constructor parameters have changed
         val updatedProfile = mapOf(
             "userId" to userId,
@@ -239,6 +260,7 @@ class ProfileActivity : AppCompatActivity() {
             "address" to address,
             "bio" to bio,
             "profilePhotoUrl" to profilePhotoUrl,
+            "ratePerHour" to ratePerHour,
             "isActive" to (activeStatusSwitch?.isChecked ?: userProfile.isActive),
             "latitude" to userProfile.latitude,
             "longitude" to userProfile.longitude,
@@ -291,15 +313,27 @@ class ProfileActivity : AppCompatActivity() {
             .addOnSuccessListener { userDoc ->
                 if (userDoc != null && userDoc.exists()) {
                     val userRole = userDoc.getString("role") ?: ""
+                    
                     if (userRole == "calingapro") {
+                        // Show CalingaPro specific fields
                         activeStatusSwitch?.visibility = View.VISIBLE
                         activeStatusSwitch?.isChecked = userProfile.isActive
                         activeStatusSwitch?.text = "Available for work"
+                        
+                        // Show rate per hour field for CalingaPros
+                        rateLayout?.visibility = View.VISIBLE
+                    } else {
+                        // Hide CalingaPro specific fields for careseekers
+                        activeStatusSwitch?.visibility = View.GONE
+                        rateLayout?.visibility = View.GONE
                     }
                 }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error checking user role: ${e.message}", Toast.LENGTH_SHORT).show()
+                // Default to hiding CalingaPro specific fields
+                activeStatusSwitch?.visibility = View.GONE
+                rateLayout?.visibility = View.GONE
             }
     }
     
