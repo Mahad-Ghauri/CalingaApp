@@ -37,4 +37,7 @@
     <!-- Navigation Colors -->
     <color name="nav_item_selected">#E3F2FD</color>
     <color name="nav_item_pressed">#BBDEFB</color>
+    
+    <!-- Chip Colors -->
+    <color name="chip_selected_background">#FFE0CC</color>
 </resources>

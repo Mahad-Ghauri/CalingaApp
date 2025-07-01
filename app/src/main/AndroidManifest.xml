@@ -64,6 +64,9 @@
         <activity
             android:name=".BookingDetailsActivity"
             android:exported="false" />
+        <activity
+            android:name=".CareseekerBookingsActivity"
+            android:exported="false" />
             
         <!-- FileProvider for camera functionality -->
         <provider

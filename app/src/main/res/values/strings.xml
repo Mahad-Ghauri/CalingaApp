@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Calinga App</string>
     <string name="app_logo">App Logo</string>
-    <string name="username_phone_email">phone | email</string>
+    <string name="username_phone_email">Phone | Email</string>
     <string name="email_hint">user@careapp.com</string>
     <string name="password">Password</string>
     <string name="repeat_password">Repeat Password</string>

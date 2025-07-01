@@ -16,6 +16,10 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_nav_profile"
             android:title="Profile" />
+        <item
+            android:id="@+id/nav_bookings"
+            android:icon="@drawable/ic_calendar"
+            android:title="My Bookings" />
     </group>
     
     <!-- Settings & Account -->
