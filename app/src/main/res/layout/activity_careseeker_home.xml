@@ -37,6 +37,7 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="36dp"
                     android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="0dp"
                     app:cardBackgroundColor="@android:color/transparent">
@@ -50,16 +51,51 @@
                         android:background="@drawable/logo_circle_background" />
                 </androidx.cardview.widget.CardView>
 
-                <!-- App title text -->
-                <TextView
+                <!-- Search bar replacing the title -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_height="36dp"
                     android:layout_weight="1"
-                    android:fontFamily="@font/sfpro_bold"
-                    android:text="CALiNGA On Demand Care "
-                    android:textColor="@color/bright_orange"
-                    android:textSize="20sp" />
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="1dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <!-- Search input container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <!-- Search icon -->
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_search"
+                            app:tint="@color/bright_orange" />
+
+                        <!-- Search input field -->
+                        <EditText
+                            android:id="@+id/editTextSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@null"
+                            android:fontFamily="@font/sfpro_med"
+                            android:hint="Search for a professional..."
+                            android:imeOptions="actionSearch"
+                            android:inputType="text"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:textSize="14sp"
+                            android:textColorHint="@color/text_gray"
+                            android:textColor="@color/dark_blue"
+                            android:maxLines="1" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
                 <!-- Menu button -->
                 <ImageView
@@ -334,51 +370,6 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- THIRD: Search Bar - Professional search functionality -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardViewSearch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp">
-
-                    <!-- Search input container -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="8dp">
-
-                        <!-- Search icon -->
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_search"
-                            app:tint="@color/bright_orange" />
-
-                        <!-- Search input field -->
-                        <EditText
-                            android:id="@+id/editTextSearch"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@null"
-                            android:fontFamily="@font/sfpro_med"
-                            android:hint="Search for a professional..."
-                            android:imeOptions="actionSearch"
-                            android:inputType="text"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="8dp"
-                            android:textSize="16sp"
-                            android:textColorHint="@color/text_gray"
-                            android:textColor="@color/dark_blue" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
                 <!-- Section header for professionals list -->
                 <TextView
                     android:id="@+id/textViewCaregivers"
@@ -447,6 +438,6 @@
         app:itemIconPadding="24dp"
         app:itemTextAppearance="@style/NavMenuTextStyle"
         app:subheaderTextAppearance="@style/NavSubheaderTextStyle"
-        android:visibility="visible"/>
+        />
 
 </androidx.drawerlayout.widget.DrawerLayout>
