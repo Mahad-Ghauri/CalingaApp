@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-06-30T18:22:44.385892500Z">
+        <DropdownSelection timestamp="2025-06-30T18:51:07.545122700Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RFCT104N7NK" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Cj\.android\avd\Cj_Galaxy_A32_5G_pixel_7_...avd" />
             </handle>
           </Target>
         </DropdownSelection>
