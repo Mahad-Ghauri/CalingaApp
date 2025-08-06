@@ -2,7 +2,9 @@ package com.myapp.calingaapp
 
 import android.content.Context
 import android.net.Uri
+import android.widget.ImageView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -140,6 +142,25 @@ class FirebaseStorageManager {
         }
     }
     
+    /**
+     * Load image from URL using Glide
+     */
+    fun loadImageFromUrl(
+        context: Context,
+        imageUrl: String,
+        imageView: ImageView,
+        placeholderRes: Int? = null,
+        errorRes: Int? = null
+    ) {
+        var glideRequest = Glide.with(context)
+            .load(imageUrl)
+        
+        placeholderRes?.let { glideRequest = glideRequest.placeholder(it) }
+        errorRes?.let { glideRequest = glideRequest.error(it) }
+        
+        glideRequest.into(imageView)
+    }
+
     /**
      * Get storage reference for a specific path
      */

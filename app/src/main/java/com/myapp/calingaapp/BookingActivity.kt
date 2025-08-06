@@ -249,36 +249,54 @@ class BookingActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         val totalHours = durationMillis / (1000 * 60 * 60.0)
         val totalAmount = totalHours * caregiverRate
 
-        // Show confirmation dialog
-        showBookingConfirmationDialog(address, notes, totalHours, totalAmount)
+        // Show payment dialog
+        showStripePaymentDialog(address, notes, totalHours, totalAmount)
     }
 
-    private fun showBookingConfirmationDialog(address: String, notes: String, totalHours: Double, totalAmount: Double) {
-        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        val fromTime = timeFormat.format(selectedTimeFrom!!.time)
-        val toTime = timeFormat.format(selectedTimeTo!!.time)
-        
-        val message = """
-            Booking Summary:
-            
-            Caregiver: $caregiverName ($caregiverTier)
-            Time: $fromTime - $toTime
-            Duration: ${String.format("%.1f", totalHours)} hours
-            Location: $address
-            Payment: $selectedPaymentMethod
-            Total: ${String.format("$%.2f", totalAmount)}
-            
-            Note: This is a temporary confirmation. Payment will be processed through Stripe when integrated.
-        """.trimIndent()
+    private fun showStripePaymentDialog(address: String, notes: String, totalHours: Double, totalAmount: Double) {
+        // Create and show modern payment dialog
+        val dialogView = layoutInflater.inflate(R.layout.dialog_payment_stripe, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
 
-        AlertDialog.Builder(this)
-            .setTitle("Confirm Booking")
-            .setMessage(message)
-            .setPositiveButton("Confirm") { _, _ ->
+        // Make dialog background transparent to show custom rounded corners
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        // Populate booking summary data
+        dialogView.findViewById<TextView>(R.id.tv_payment_caregiver_name).text = "$caregiverName ($caregiverTier)"
+        dialogView.findViewById<TextView>(R.id.tv_payment_duration).text = "${String.format("%.1f", totalHours)} hours"
+        dialogView.findViewById<TextView>(R.id.tv_payment_total_amount).text = String.format("$%.2f", totalAmount)
+        
+        // Handle close button
+        dialogView.findViewById<ImageView>(R.id.btn_close_payment).setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // Handle cancel button
+        dialogView.findViewById<LinearLayout>(R.id.btn_cancel_payment).setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // Handle confirm payment button
+        dialogView.findViewById<LinearLayout>(R.id.btn_confirm_payment).setOnClickListener {
+            // Simulate payment processing with a brief delay
+            val confirmButton = dialogView.findViewById<LinearLayout>(R.id.btn_confirm_payment)
+            val confirmText = confirmButton.findViewById<TextView>(R.id.tv_confirm_payment_text)
+            
+            confirmButton.isEnabled = false
+            confirmText.text = "Processing..."
+            
+            // Simulate payment processing delay
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                dialog.dismiss()
+                // Process the actual booking
                 processBooking(address, notes, totalHours, totalAmount)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+            }, 2000) // 2 second delay to simulate payment processing
+        }
+        
+        dialog.show()
     }
 
     private fun processBooking(address: String, notes: String, totalHours: Double, totalAmount: Double) {

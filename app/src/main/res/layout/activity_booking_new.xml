@@ -424,11 +424,18 @@
                         android:clickable="true"
                         android:focusable="true">
 
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_payment"
+                            app:tint="@color/white"
+                            android:layout_marginEnd="8dp" />
+
                         <TextView
                             android:id="@+id/tv_confirm_booking_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Confirm Booking"
+                            android:text="Proceed to Payment"
                             android:textColor="@color/white"
                             android:textSize="18sp"
                             android:fontFamily="@font/sfpro_bold" />

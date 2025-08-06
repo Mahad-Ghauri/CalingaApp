@@ -40,6 +40,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
     private lateinit var db: FirebaseFirestore
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationManager: LocationManager
+    private lateinit var storageManager: FirebaseStorageManager
     
     private lateinit var recyclerView: RecyclerView
     private lateinit var calingaProAdapter: CalingaProAdapter
@@ -80,6 +81,7 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
         db = FirebaseFirestore.getInstance()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationManager = LocationManager(this)
+        storageManager = FirebaseStorageManager()
         
         // Initialize UI components
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -215,11 +217,31 @@ class CareseekerHomeActivity : AppCompatActivity(), NavigationView.OnNavigationI
             findViewById<TextView>(R.id.textViewPatientAge).text = if (profile.age != null) "${profile.age} years old" else "Age not set"
             findViewById<TextView>(R.id.textViewPatientAddress).text = profile.address
             
-            // Load profile image if available (you could use Glide or Picasso here)
+            // Load profile image from Firebase Storage
+            val patientImageView = findViewById<CircleImageView>(R.id.imageViewPatient)
+            
             if (profile.profilePhotoUrl.isNotEmpty()) {
-                // This would require a library like Glide or Picasso
-                // Glide.with(this).load(profile.profilePhotoUrl).into(navHeaderImage)
-                // Glide.with(this).load(profile.profilePhotoUrl).into(findViewById(R.id.imageViewPatient))
+                // Load image from Firebase Storage URL
+                storageManager.loadImageFromUrl(
+                    context = this,
+                    imageUrl = profile.profilePhotoUrl,
+                    imageView = patientImageView,
+                    placeholderRes = R.drawable.careseeker,
+                    errorRes = R.drawable.careseeker
+                )
+                
+                // Also update navigation header image
+                storageManager.loadImageFromUrl(
+                    context = this,
+                    imageUrl = profile.profilePhotoUrl,
+                    imageView = navHeaderImage,
+                    placeholderRes = R.drawable.ic_person_placeholder,
+                    errorRes = R.drawable.ic_person_placeholder
+                )
+            } else {
+                // Use default placeholder images
+                patientImageView.setImageResource(R.drawable.careseeker)
+                navHeaderImage.setImageResource(R.drawable.ic_person_placeholder)
             }
         }
     }
