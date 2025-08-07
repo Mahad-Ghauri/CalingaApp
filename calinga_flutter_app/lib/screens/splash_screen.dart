@@ -60,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // App Logo
             Image.asset(
-              'assets/images/calinga_logo.png',
+              'assets/images/logo_calinga.png',
               width: 200,
               height: 200,
               errorBuilder: (context, error, stackTrace) {
